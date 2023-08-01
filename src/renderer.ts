@@ -1,3 +1,3 @@
-export function render() {
+export function render(): void {
   console.log('render')
 }

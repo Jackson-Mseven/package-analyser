@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>关系依赖图</title>
+  <style>
+    * {
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      -khtml-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+  </style>
+  <script type="text/javascript" src="http://d3js.org/d3.v5.min.js"></script>
+</head>
+
+<body>
+  <svg width="800" height="500"></svg>
+  <script>
+    //定义边界
+    const marge = { top: -30, bottom: 0, left: 50, right: 50 };
+
+    const svg = d3.select("svg");
+    const width = svg.attr("width");
+    const height = svg.attr("height");
+
+    const g = svg.append("g")
+      .attr("transform", "translate(" + marge.top + "," + marge.left + ")");
+
+    const scale = svg.append("g")
+      .attr("transform", "translate(" + marge.top + "," + marge.left + ")");
+    //数据
+    const dataset = {
+      name: "glob",
+      children: [
+        {
+          name: "minimatch",
+          children: [
+            {
+              name: "brace-expansion",
+              children: [
+                { name: "balanced-match" }
+              ]
+            }
+          ]
+        },
+        {
+          name: "fs.realPath"
+        },
+        {
+          name: "minipass"
+        },
+        {
+          name: "path-s curry",
+          children: [
+            { name: "Iru-cache" }
+          ]
+        }
+      ]
+    };
+
+    //创建一个hierarchy layout
+    const hierarchyData = d3.hierarchy(dataset)
+      .sum(function (d) {
+        return d.value;
+      });
+
+    //创建一个树状图
+    const tree = d3.tree()
+      .size([width, height - 150])
+      .separation((a, b) => a.depth + 1);
+
+    //初始化树状图，也就是传入数据,并得到绘制树基本数据
+    const treeData = tree(hierarchyData);
+    console.log('data is:', treeData);
+
+    //得到节点
+    const nodes = treeData.descendants();
+    const links = treeData.links();
+
+    //输出节点和边
+    console.log("节点:", nodes);
+    console.log("边:", links);
+
+    //创建一个贝塞尔生成曲线生成器
+    const Bézier_curve_generator = d3.linkHorizontal()
+      .x(function (d) { return d.x; })
+      .y(function (d) { return d.y; });
+
+    // 定义箭头
+    const arrowMarker = svg.append('defs')
+      .append('marker')
+      .attr('id', 'arrow')
+      .attr('markerWidth', 15)
+      .attr('markerHeight', 15)
+      .attr('refX', 7)
+      .attr('refY', 5)
+      .attr('orient', 'auto')
+      .attr('markerUnits', 'userSpaceOnUse');
+
+    arrowMarker.append('path')
+      .attr('d', 'M0,0 L0,10 L10,5 Z') // 定义箭头的形状
+      .attr('fill', 'black');
+
+    //绘制连线
+    g.append('g')
+      .selectAll('path')
+      .data(links)
+      .enter()
+      .append('path')
+      .attr('d', function (d) {
+        // console.log("d is:", d);
+        const start = { x: d.source.x + 10, y: d.source.y + 30 };
+        const end = { x: d.target.x + 30, y: d.target.y - 4 };
+        return Bézier_curve_generator({ source: start, target: end });
+      })
+      .attr('fill', 'none')
+      .attr('stroke', 'black')
+      .attr('stroke-width', 1)
+      .attr('marker-end', 'url(#arrow)'); // 添加箭头
+
+    //绘制节点和文字
+    const gs = g.append("g")
+      .selectAll("g")
+      .data(nodes)
+      .enter()
+      .append("g")
+      .attr("transform", function (d) {
+        const cx = d.x;
+        const cy = d.y;
+        return "translate(" + cx + "," + cy + ")";
+      });
+
+    // 绘制矩形节点
+    gs.append("rect")
+      .attr("width", 100)
+      .attr("height", 50)
+      .attr("fill", "white")
+      .attr("stroke", "black")
+      .attr("stroke-width", 1)
+
+    // 绘制文字
+    gs.append("text")
+      .attr("x", 50) // 设置文字的水平居中位置
+      .attr("y", 25) // 设置文字的垂直居中位置
+      .attr("text-anchor", "middle")
+      .attr("dominant-baseline", "middle") // 垂直对齐方式设为middle
+      .text(function (d) {
+        return d.data.name;
+      });
+
+    // 遍历节点
+    gs.each(function (d) {
+      const textNode = d3.select(this).select("text"); // 当前节点下的文本元素
+      const textLength = textNode.node().getComputedTextLength(); // 获取文本长度
+      const rectNode = d3.select(this).select("rect"); // 当前节点下的矩形元素
+      rectNode.attr("width", Math.max(50, textLength + 20)); // 动态设置矩形节点的宽度
+      textNode.attr('x', (textLength + 20) / 2); // 动态设置文字的水平位置
+    });
+  </script>
+</body>
+
+</html>
