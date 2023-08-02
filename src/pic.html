@@ -19,25 +19,33 @@
       -ms-user-select: none;
       user-select: none;
     }
+
+    #svg_div {
+      width: 90vw;
+      height: 90vh;
+      border: 1px solid #c0c4cc;
+      position: relative;
+      left: 5vw;
+      top: 5vh;
+    }
   </style>
   <script type="text/javascript" src="http://d3js.org/d3.v5.min.js"></script>
 </head>
 
 <body>
-  <svg width="800" height="500"></svg>
+  <div>
+    <div id="svg_div"></div>
+  </div>
   <script>
-    //定义边界
-    const marge = { top: -30, bottom: 0, left: 50, right: 50 };
+    const minX = 1000
+    const minY = 1000
+    const smallGrid = 20
+    const Grid = 100
+    const MARGIN_LEFT = 100
+    const MARGIN_TOP = 50
+    const EVERY_TOTAL_WIDTH = 150
+    const EVERY_TOTAL_HEIGHT = 200
 
-    const svg = d3.select("svg");
-    const width = svg.attr("width");
-    const height = svg.attr("height");
-
-    const g = svg.append("g")
-      .attr("transform", "translate(" + marge.top + "," + marge.left + ")");
-
-    const scale = svg.append("g")
-      .attr("transform", "translate(" + marge.top + "," + marge.left + ")");
     //数据
     const dataset = {
       name: "glob",
@@ -76,7 +84,7 @@
 
     //创建一个树状图
     const tree = d3.tree()
-      .size([width, height - 150])
+      .size([minX, minY - 150])
       .separation((a, b) => a.depth + 1);
 
     //初始化树状图，也就是传入数据,并得到绘制树基本数据
@@ -91,13 +99,101 @@
     console.log("节点:", nodes);
     console.log("边:", links);
 
+    // 添加svg
+    d3.select("#svg_div")
+      .append("svg")
+      .attr("id", "SVG")
+      .attr("width", "100%")
+      .attr("height", "100%")
+
+    // 绘制栅格背景
+    const defs = d3.select("SVG").append('defs')
+    defs.append('pattern')
+      .attr('id', 'smallGrid')
+      .attr('width', smallGrid)
+      .attr('height', smallGrid)
+      .attr('patternUnits', 'userSpaceOnUse')
+      .append('path')
+      .attr('fill', 'none')
+      .attr('stroke', 'gray')
+      .attr('stoke-width', '0.5')
+
+    const border = defs.append('pattern')
+    border.attr('id', 'grid')
+      .attr('width', Grid)
+      .attr('height', Grid)
+      .attr('patternUnits', 'userSpaceOnUse')
+      .append('rect')
+      .attr('width', Grid)
+      .attr('height', Grid)
+      .attr('fill', 'url(#smallGrid)')
+    border.append('path')
+      .attr('d', `M ${Grid} 0 L 0 0 0 ${Grid}`)
+      .attr('fill', 'none')
+      .attr('stroke', 'gray')
+      .attr('stroke-width', '1')
+
+    d3.select("SVG")
+      .append('rect')
+      .attr('id', 'bg-grid')
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('fill', 'url(#grid)')
+    d3.select("SVG")
+      .call(d3.zoom()
+        .scaleExtent([0.5, 4])
+        .on('zoom', zoomed))
+
+    // 拖拽缩放
+    function zoomed() {
+      d3.select("#graph").attr("transform", d3.event.transform)
+
+      const k = d3.event.transform.k
+      // 栅格缩放
+      d3.select('#smallGrid')
+        .attr('width', smallGrid * k)
+        .attr('height', smallGrid * k)
+      d3.select('#smallGrid')
+        .select('path')
+        .attr('width', smallGrid * k)
+        .attr('height', smallGrid * k)
+        .attr('d', `M ${smallGrid * k} 0 L 0 0 0 ${smallGrid * k}`)
+
+      d3.select('#grid')
+        .attr('width', Grid * k)
+        .attr('height', Grid * k)
+      d3.select('#grid')
+        .select('rect')
+        .attr('width', Grid * k)
+        .attr('height', Grid * k)
+      d3.select('#grid')
+        .select('path')
+        .attr('d', `M ${Grid * k} 0 L 0 0 0 ${Grid * k}`)
+    }
+
+    //定义边界
+    const marge = { top: -30, bottom: 0, left: 50, right: 50 };
+
+    d3.select("#SVG")
+      .append("g")
+      .attr("id", "graph")
+      .attr("width", EVERY_TOTAL_WIDTH * nodes.length + MARGIN_LEFT)
+      .attr("height", EVERY_TOTAL_HEIGHT * nodes.length + MARGIN_TOP)
+
+    const g = d3.select("#graph").append("g")
+      .attr("transform", "translate(" + marge.top + "," + marge.left + ")");
+
+    const scale = d3.select("#graph").append("g")
+      .attr("transform", "translate(" + marge.top + "," + marge.left + ")");
+
+
     //创建一个贝塞尔生成曲线生成器
-    const Bézier_curve_generator = d3.linkHorizontal()
+    const Bezier_curve_generator = d3.linkHorizontal()
       .x(function (d) { return d.x; })
       .y(function (d) { return d.y; });
 
     // 定义箭头
-    const arrowMarker = svg.append('defs')
+    const arrowMarker = d3.select("SVG").append('defs')
       .append('marker')
       .attr('id', 'arrow')
       .attr('markerWidth', 15)
@@ -118,10 +214,9 @@
       .enter()
       .append('path')
       .attr('d', function (d) {
-        // console.log("d is:", d);
         const start = { x: d.source.x + 10, y: d.source.y + 30 };
         const end = { x: d.target.x + 30, y: d.target.y - 4 };
-        return Bézier_curve_generator({ source: start, target: end });
+        return Bezier_curve_generator({ source: start, target: end });
       })
       .attr('fill', 'none')
       .attr('stroke', 'black')
@@ -166,6 +261,7 @@
       rectNode.attr("width", Math.max(50, textLength + 20)); // 动态设置矩形节点的宽度
       textNode.attr('x', (textLength + 20) / 2); // 动态设置文字的水平位置
     });
+
   </script>
 </body>
 
