@@ -188,28 +188,29 @@
     // 添加resize事件监听器，以便在视口大小发生变化时更新g元素的位置
     window.addEventListener("resize", updateGPosition);
 
-    // 连线
+    // 连线（折线）
     const marker = g.append("defs")
       .append("marker")
       .attr("id", "arrow")
       .attr("markerUnits", "strokeWidth")
-      .attr("markerWidth", "18")
-      .attr("markerHeight", "18")
+      .attr("markerWidth", "16")
+      .attr("markerHeight", "16")
       .attr("viewBox", "0 0 12 12")
-      .attr("refX", "20") // 调整箭头的位置偏移量
-      .attr("refY", "5.4")
+      // 调整箭头的位置偏移量
+      .attr("refX", "20")
+      .attr("refY", "4")
       .attr("orient", "auto");
 
     // 箭头
     marker.append("path")
-      .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
+      .attr("d", "M2,2 L10,6 L2,10 L6,6 Z")
       .attr("fill", "black");
 
     // 创建力导向图模拟
     const simulation = d3.forceSimulation(data.nodes)
-      .force("link", d3.forceLink(data.links).id(function (d) { return d.id; }).distance(150))
-      .force("charge", d3.forceManyBody().strength(-100)) // 创建斥力
-      .force("center", d3.forceCenter(0, 0)); // 设置中心点
+      .force("link", d3.forceLink(data.links).id(function (d) { return d.id; }).distance(120))
+      .force("charge", d3.forceManyBody().strength(-150)) // 创建斥力
+      .force("center", d3.forceCenter(0, -200)); // 设置中心点
 
     // 节点拖拽行为
     function dragstarted(d) {
@@ -239,8 +240,28 @@
       link.attr("d", function (d) {
         const dx = d.target.x - d.source.x,
           dy = d.target.y - d.source.y,
+          sourcePadding = 10, // 起始节点的填充
+          targetPadding = 10, // 目标节点的填充
+          hDirection = dx > 0 ? 1 : -1, // 计算水平方向
+          vDirection = dy > 0 ? 1 : -1, // 计算垂直方向
           dr = Math.sqrt(dx * dx + dy * dy);
-        return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+
+        return (
+          "M" +
+          (d.source.x + sourcePadding * hDirection) +
+          "," +
+          d.source.y +
+          "H" +
+          (d.target.x - targetPadding * hDirection) +
+          "V" +
+          (d.target.y + targetPadding * vDirection) +
+          "H" +
+          d.target.x +
+          "L" +
+          d.target.x +
+          "," +
+          d.target.y
+        );
       });
 
       // 移动节点到最新位置

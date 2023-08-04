@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>关系依赖图</title>
+  <style>
+    * {
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      -khtml-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    #backBtn {
+      position: relative;
+      top: 2vh;
+      left: 5vw;
+      display: inline-block;
+      width: 100px;
+      height: 40px;
+    }
+
+    #svg_div {
+      width: 90vw;
+      height: 85vh;
+      border: 1px solid #c0c4cc;
+      position: relative;
+      left: 5vw;
+      top: 5vh;
+    }
+
+    .link {
+      fill: none;
+      stroke: black;
+      stroke-width: 1.5px;
+      marker-end: url(#arrow);
+    }
+
+    .node {
+      fill: rgba(255, 255, 255, 0.7);
+      stroke: black;
+      stroke-width: 2px;
+    }
+  </style>
+  <script type="text/javascript" src="http://d3js.org/d3.v5.min.js"></script>
+</head>
+
+<body>
+  <div>
+    <button id="backBtn">返回中心</button>
+    <div id="svg_div"></div>
+  </div>
+  <script>
+    const button = document.querySelector("#backBtn");
+    button.addEventListener("click", updateGPosition); //返回初始位置
+
+    const smallGrid = 20;
+    const Grid = 60;
+    const MARGIN_LEFT = 100;
+    const MARGIN_TOP = 50;
+
+    // 依赖关系数据
+    const data = {
+      nodes: [
+        { id: "glob" },
+        { id: "minimatch" },
+        { id: "brace-expansion" },
+        { id: "balanced-match" },
+        { id: "fs.realPath" },
+        { id: "minipass" },
+        { id: "path-s curry" },
+        { id: "Iru-cache" },
+        { id: "text1" },
+        { id: "text2" },
+      ],
+      links: [
+        { source: "glob", target: "minimatch" },
+        { source: "glob", target: "fs.realPath" },
+        { source: "glob", target: "minipass" },
+        { source: "glob", target: "path-s curry" },
+        { source: "minimatch", target: "brace-expansion" },
+        { source: "brace-expansion", target: "balanced-match" },
+        { source: "path-s curry", target: "minipass" },
+        { source: "path-s curry", target: "Iru-cache" },
+      ],
+    };
+
+    // 添加svg元素
+    d3.select("#svg_div")
+      .append("svg")
+      .attr("id", "SVG")
+      .attr("width", "100%")
+      .attr("height", "100%");
+
+    // 绘制栅格背景
+    const defs = d3.select("SVG").append("defs");
+    defs.append("pattern")
+      .attr("id", "smallGrid")
+      .attr("width", smallGrid)
+      .attr("height", smallGrid)
+      .attr("patternUnits", "userSpaceOnUse")
+      .append("path")
+      .attr("fill", "none")
+      .attr("stroke", "gray")
+      .attr("stoke-width", "0.5");
+
+    const border = defs.append("pattern");
+    border.attr("id", "grid")
+      .attr("width", Grid)
+      .attr("height", Grid)
+      .attr("patternUnits", "userSpaceOnUse")
+      .append("rect")
+      .attr("width", Grid)
+      .attr("height", Grid)
+      .attr("fill", "url(#smallGrid)");
+    border.append("path")
+      .attr("d", `M ${Grid} 0 L 0 0 0 ${Grid}`)
+      .attr("fill", "none")
+      .attr("stroke", "gray")
+      .attr("stroke-width", "1");
+
+    d3.select("SVG")
+      .append("rect")
+      .attr("id", "bg-grid")
+      .attr("width", "100%")
+      .attr("height", "100%")
+      .attr("fill", "url(#grid)");
+
+    d3.select("SVG")
+      .call(d3.zoom()
+        .scaleExtent([0.5, 4])
+        .on("zoom", zoomed));
+
+    // 拖拽缩放
+    function zoomed() {
+      d3.select("#graph").attr("transform", d3.event.transform);
+
+      const k = d3.event.transform.k;
+      // 栅格缩放
+      d3.select("#smallGrid")
+        .attr("width", smallGrid * k)
+        .attr("height", smallGrid * k);
+      d3.select("#smallGrid")
+        .select("path")
+        .attr("width", smallGrid * k)
+        .attr("height", smallGrid * k)
+        .attr("d", `M ${smallGrid * k} 0 L 0 0 0 ${smallGrid * k}`);
+
+      d3.select("#grid")
+        .attr("width", Grid * k)
+        .attr("height", Grid * k);
+      d3.select("#grid")
+        .select("rect")
+        .attr("width", Grid * k)
+        .attr("height", Grid * k);
+      d3.select("#grid")
+        .select("path")
+        .attr("d", `M ${Grid * k} 0 L 0 0 0 ${Grid * k}`);
+    }
+
+    // 创建图形容器
+    d3.select("#SVG")
+      .append("g")
+      .attr("id", "graph");
+
+
+    // 创建力导向图容器
+    const g = d3.select("#graph").append("g");
+
+    // 根据视口大小更新g元素的位置
+    function updateGPosition() {
+      let viewportWidth = window.innerWidth;
+      let viewportHeight = window.innerHeight;
+      g.attr("transform", `translate(${viewportWidth / 2},${viewportHeight / 2})`);
+      d3.zoom().scaleExtent([0.5, 4]).on("zoom", zoomed).transform(d3.select("SVG"), d3.zoomIdentity); // 重置内部状态
+    }
+    // 在页面加载完成时初始化g元素的位置
+    updateGPosition();
+    // 添加resize事件监听器，以便在视口大小发生变化时更新g元素的位置
+    window.addEventListener("resize", updateGPosition);
+
+    // 连线（曲线）
+    const marker = g.append("defs")
+      .append("marker")
+      .attr("id", "arrow")
+      .attr("markerUnits", "strokeWidth")
+      .attr("markerWidth", "18")
+      .attr("markerHeight", "18")
+      .attr("viewBox", "0 0 12 12")
+      .attr("refX", "20") // 调整箭头的位置偏移量
+      .attr("refY", "5.4")
+      .attr("orient", "auto");
+
+    // 箭头
+    marker.append("path")
+      .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
+      .attr("fill", "black");
+
+    // 创建力导向图模拟
+    const simulation = d3.forceSimulation(data.nodes)
+      .force("link", d3.forceLink(data.links).id(function (d) { return d.id; }).distance(150))
+      .force("charge", d3.forceManyBody().strength(-100)) // 创建斥力
+      .force("center", d3.forceCenter(0, 0)); // 设置中心点
+
+    // 节点拖拽行为
+    function dragstarted(d) {
+      if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+    function dragged(d) {
+      d.fx = d3.event.x;
+      d.fy = d3.event.y;
+    }
+    function dragended(d) {
+      if (!d3.event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    }
+
+    // 创建路径  PS:路径与节点有层叠性，故先创新路径为底
+    const link = g.selectAll(".link")
+      .data(data.links)
+      .enter()
+      .append("path")
+      .attr("class", "link");
+
+    simulation.on("tick", function () {
+      // 定义了路径元素的形状
+      link.attr("d", function (d) {
+        const dx = d.target.x - d.source.x,
+          dy = d.target.y - d.source.y,
+          dr = Math.sqrt(dx * dx + dy * dy);
+        return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+      });
+
+      // 移动节点到最新位置
+      node.attr("transform", function (d) {
+        return "translate(" + d.x + "," + d.y + ")";
+      });
+    });
+
+    // 创建节点
+    const node = g.selectAll(".node")
+      .data(data.nodes)
+      .enter().append("g")
+      .attr("class", "node")
+      .call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended));
+
+    const rect = node.append("rect");
+    const text = node.append("text")
+      .text(function (d) { return d.id; })
+      .attr("fill", "black")
+      .attr("text-anchor", "middle")
+      .attr("dominant-baseline", "central")
+      .attr("font-weight", "100");
+
+    const nodePadding = 20; // 文本宽度
+    function updateNodes() {
+      // 边框宽度
+      rect.attr("width", function (d) { return getTextWidth(d.id) + nodePadding; })
+        .attr("height", function (d) { return getTextHeight(d.id) + nodePadding; })
+        .attr("rx", 6)
+        .attr("ry", 6)
+        .attr("x", function (d) { return -getTextWidth(d.id) / 2 - nodePadding / 2; })
+        .attr("y", function (d) { return -getTextHeight(d.id) / 2 - nodePadding / 2; });
+
+      // 创建碰撞力，避免节点重叠
+      simulation.force("collision", d3.forceCollide().radius(function (d) {
+        return Math.max(getTextWidth(d.id), getTextHeight(d.id)) + nodePadding;
+      }))
+    }
+    updateNodes();
+
+    // 获得文本宽高
+    function getTextWidth(text) {
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      context.font = "14px Courier New";
+      return context.measureText(text).width;
+    }
+    function getTextHeight(text) {
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      context.font = "14px Courier New";
+      const metrics = context.measureText("M");
+      return metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+    }
+  </script>
+</body>
+
+</html>
