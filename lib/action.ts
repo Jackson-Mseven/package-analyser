@@ -1,4 +1,5 @@
 import getDependHash from './analysisDepend/virtualFloder';
+import path = require('path');
 /**
  * 定义命令执行的回调函数
  */
@@ -25,7 +26,10 @@ module.exports = function (
 		// console.log(version);
 		// console.log(dependencies);
 		// console.log(devDependencies);
-		const hash = await getDependHash(jsonFile, depth);
+		let folderPath = path.dirname(jsonFile);
+		folderPath = folderPath || process.cwd();
+		depth = depth || '1';
+		const hash = await getDependHash(folderPath, depth);
 		console.log(hash);
 	};
 };
