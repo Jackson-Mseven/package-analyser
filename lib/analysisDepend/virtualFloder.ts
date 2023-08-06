@@ -104,13 +104,15 @@ export const findDepend = (
 
 const findDepend_ChildDepend = (
 	virtualFolder: Panalyze.VirtualFolder,
-	depth: number
+	depth: number,
+	dependName: Panalyze.denpendType
 ) => {
 	const hash: Record<string, Record<string, string>> = {};
 	function dfs(
 		virtualFolder: Panalyze.VirtualFolder,
 		/**递归深度 */ d: number,
-		importName?: string
+		importName: string | null,
+		dependName: Panalyze.denpendType = field.dependencies
 	) {
 		const pack = virtualFolder.file[field.packageJson] as Panalyze.Package;
 		const { name, version } = pack || {};
@@ -118,7 +120,7 @@ const findDepend_ChildDepend = (
 
 		if (pack && name && version && !hash[nameVersion]) {
 			hash[nameVersion] = {};
-			Object.entries(pack.dependencies || {}).forEach(
+			Object.entries(pack[dependName] || {}).forEach(
 				([name, versionCondition]) => {
 					const depndInfo = findDepend(name, versionCondition, virtualFolder);
 					if (!depndInfo) return null;
@@ -129,7 +131,7 @@ const findDepend_ChildDepend = (
 			);
 		}
 	}
-	dfs(virtualFolder, 1);
+	dfs(virtualFolder, 1, null, dependName);
 	return hash;
 };
 
@@ -140,8 +142,15 @@ const findDepend_ChildDepend = (
 //   debugger;
 // }
 // test();
-export default async function getDependHash(path: string, depth: string) {
-	const VF = await getVirtualFolder(path);
-	const hash = findDepend_ChildDepend(VF, isNumberStr(depth) ? +depth : 1);
+export default async function getDependHash(
+	depth: string,
+	dependName: Panalyze.denpendType = field.dependencies
+) {
+	const VF = await getVirtualFolder(process.cwd());
+	const hash = findDepend_ChildDepend(
+		VF,
+		isNumberStr(depth) ? +depth : 1,
+		dependName
+	);
 	return hash;
 }

@@ -1,5 +1,6 @@
+import field from './analysisDepend/field';
 import getDependHash from './analysisDepend/virtualFloder';
-import path = require('path');
+import * as fs from 'fs/promises';
 /**
  * 定义命令执行的回调函数
  */
@@ -22,14 +23,15 @@ module.exports = function (
 	 * @params {string} jsonFile：导出的 JSON 文件路径
 	 */
 	return async function (depth: string, jsonFile: string) {
-		// console.log(packageName);
-		// console.log(version);
-		// console.log(dependencies);
-		// console.log(devDependencies);
-		let folderPath = path.dirname(jsonFile);
-		folderPath = folderPath || process.cwd();
 		depth = depth || '1';
-		const hash = await getDependHash(folderPath, depth);
-		console.log(hash);
+		const dependHash = await getDependHash(depth);
+		const devPendHash = await getDependHash(depth, field.devDependencies);
+		if (jsonFile) {
+			const dep = {
+				dependHash,
+				devPendHash,
+			};
+			fs.writeFile(jsonFile, JSON.stringify(dep, null, 2));
+		}
 	};
 };
