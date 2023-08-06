@@ -4,9 +4,9 @@ import * as Panalyze from './type';
 import {
 	checkVersion,
 	getJsonFileObjPath,
+	isNumberStr,
 	nameVersionStringify,
 } from './utils';
-import { parentSybmol } from './Symbol';
 import field from './field';
 const targetPath = 'E:/div/test_package/test_case';
 const ignoreFolder = ['.bin', 'lib'];
@@ -102,9 +102,16 @@ export const findDepend = (
 // }
 // findDependTest();
 
-const findDepend_ChildDepend = (virtualFolder: Panalyze.VirtualFolder) => {
+const findDepend_ChildDepend = (
+	virtualFolder: Panalyze.VirtualFolder,
+	depth: number
+) => {
 	const hash: Record<string, Record<string, string>> = {};
-	function dfs(virtualFolder: Panalyze.VirtualFolder, importName?: string) {
+	function dfs(
+		virtualFolder: Panalyze.VirtualFolder,
+		/**递归深度 */ d: number,
+		importName?: string
+	) {
 		const pack = virtualFolder.file[field.packageJson] as Panalyze.Package;
 		const { name, version } = pack || {};
 		const nameVersion = nameVersionStringify(importName || name, version);
@@ -117,12 +124,12 @@ const findDepend_ChildDepend = (virtualFolder: Panalyze.VirtualFolder) => {
 					if (!depndInfo) return null;
 					const [childPack, childVFolder] = depndInfo;
 					hash[nameVersion][name] = childPack.version;
-					dfs(childVFolder, name);
+					if (d < depth) dfs(childVFolder, d + 1, name);
 				}
 			);
 		}
 	}
-	dfs(virtualFolder);
+	dfs(virtualFolder, 1);
 	return hash;
 };
 
@@ -135,6 +142,6 @@ const findDepend_ChildDepend = (virtualFolder: Panalyze.VirtualFolder) => {
 // test();
 export default async function getDependHash(path: string, depth: string) {
 	const VF = await getVirtualFolder(path);
-	const hash = findDepend_ChildDepend(VF);
+	const hash = findDepend_ChildDepend(VF, isNumberStr(depth) ? +depth : 1);
 	return hash;
 }

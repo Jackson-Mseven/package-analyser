@@ -29,3 +29,7 @@ export async function getJsonFileObjPath(path: string) {
 		return null;
 	}
 }
+
+export const isNumberStr = (s: string) => {
+	return /^-?\d*\.?\d+$/.test(s);
+};
