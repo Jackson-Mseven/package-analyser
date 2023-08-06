@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    // 指定编译文件输出目录
+    "outDir": "./dist",
+    // 指定 ts 被编译为的 ES 版本
+    "target": "ES5",
+    // 指定要使用的模块化规范
+    "module": "commonjs",
+    // 开启严格总开关
+    "strict": true,
+    // 编译后移除注释
+    "removeComments": true,
+    // 当有错误时，不生成编译后的文件
+    "noEmitOnError": true,
+    // 开启严格模式
+    "alwaysStrict": true,
+    // 不允许隐式any
+    "noImplicitAny": true,
+    // 不允许未知的this
+    "noImplicitThis": true,
+    // 严格检查空值
+    "strictNullChecks": true
+  }
+}

@@ -1,0 +1,14 @@
+/* 
+  项目设置
+*/
+
+{
+  // 设置 prettier 为默认格式器
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  // 保存自动格式化
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    // eslint 自动修复
+    "source.fixAll.eslint": true
+  }
+}
