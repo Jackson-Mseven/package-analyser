@@ -1,4 +1,8 @@
 import field from './analysisDepend/field';
+import {
+	dependHash_To_nameVersionsObj,
+	nameVersionParse,
+} from './analysisDepend/utils';
 import getDependHash from './analysisDepend/virtualFloder';
 import * as fs from 'fs/promises';
 /**
@@ -26,10 +30,16 @@ module.exports = function (
 		depth = depth || '1';
 		const dependHash = await getDependHash(depth);
 		const devPendHash = await getDependHash(depth, field.devDependencies);
+
+		const dependToVersionsObj = dependHash_To_nameVersionsObj(dependHash);
+		const devDependToVersionsObj = dependHash_To_nameVersionsObj(devPendHash);
+
 		if (jsonFile) {
 			const dep = {
 				dependHash,
 				devPendHash,
+				dependToVersionsObj,
+				devDependToVersionsObj,
 			};
 			fs.writeFile(jsonFile, JSON.stringify(dep, null, 2));
 		}
