@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import * as semver from 'semver';
-import { pathSymbol } from './Symbol';
+import { pathSymbol } from './npm_yarn/Symbol';
 
 /**
  * 合法版本号是否符合条件

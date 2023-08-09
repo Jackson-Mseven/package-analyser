@@ -1,9 +1,9 @@
-import field from './analysisDepend/field';
+import field from './analysisDepend/npm_yarn/field';
 import {
 	dependHash_To_nameVersionsObj,
 	nameVersionParse,
 } from './analysisDepend/utils';
-import getDependHash from './analysisDepend/virtualFloder';
+import getDependHash from './analysisDepend/npm_yarn';
 import * as fs from 'fs/promises';
 /**
  * 定义命令执行的回调函数

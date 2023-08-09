@@ -6,7 +6,7 @@ import {
 	getJsonFileObjPath,
 	isNumberStr,
 	nameVersionStringify,
-} from './utils';
+} from '../utils';
 import field from './field';
 const targetPath = 'E:/div/test_package/test_case';
 const ignoreFolder = ['.bin', 'lib'];
@@ -26,9 +26,13 @@ const getVirtualFolder = async (folderPath: string) => {
 			const stat = await fs.stat(fileDir);
 
 			if (stat.isFile() && filename == field.packageJson) {
-				const pack = await getJsonFileObjPath(fileDir);
-				if (!pack) continue;
-				virtualFolder.file[filename] = pack;
+				try {
+					const pack = require(fileDir);
+					if (!pack) continue;
+					virtualFolder.file[filename] = pack;
+				} catch (e) {
+					console.log(fileDir);
+				}
 			}
 
 			if (stat.isDirectory()) {
