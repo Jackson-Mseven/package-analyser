@@ -15,6 +15,13 @@ module.exports = function (packageName: string, version: string, packageManageme
    * @param {string} jsonFile：导出的 JSON 文件路径
    */
   return function (depth: string, jsonFile: string) {
+    if (!jsonFile) {
+      const server: Function = require('./server')
+      server()
+    } else {
+      console.log('输出JSON');
+
+    }
     console.log(packageManagementTools)
   }
 }
