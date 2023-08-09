@@ -19,6 +19,6 @@
     // 不允许未知的this
     "noImplicitThis": true,
     // 严格检查空值
-    "strictNullChecks": true
+    "strictNullChecks": true,
   }
 }

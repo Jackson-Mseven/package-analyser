@@ -1,9 +1,6 @@
 "use strict";
-module.exports = function (packageName, version, dependencies, devDependencies) {
+module.exports = function (packageName, version, packageManagementTools, dependencies, devDependencies) {
     return function (depth, jsonFile) {
-        console.log(packageName);
-        console.log(version);
-        console.log(dependencies);
-        console.log(devDependencies);
+        console.log(packageManagementTools);
     };
 };
