@@ -7,7 +7,7 @@ import {
 	isNumberStr,
 	nameVersionStringify,
 } from '../utils';
-import field from './field';
+import field from '../field';
 const targetPath = 'E:/div/test_package/test_case';
 const ignoreFolder = ['.bin', 'lib'];
 

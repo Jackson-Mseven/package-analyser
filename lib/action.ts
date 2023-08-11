@@ -1,4 +1,4 @@
-import field from './analysisDepend/npm_yarn/field';
+import field from './analysisDepend/field';
 import {
 	dependHash_To_nameVersionsObj,
 	nameVersionParse,

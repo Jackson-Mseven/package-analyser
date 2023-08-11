@@ -1,6 +1,7 @@
 import * as fs from 'fs/promises';
 import * as semver from 'semver';
-import { pathSymbol } from './npm_yarn/Symbol';
+import { Package } from './npm_yarn/type';
+import { pathSymbol } from './Symbol';
 
 /**
  * 合法版本号是否符合条件
@@ -40,8 +41,9 @@ export async function getJsonFileObjPath(path: string) {
 		const packJson = await fs.readFile(path, 'utf-8');
 		const pack = JSON.parse(packJson);
 		pack[pathSymbol] = path;
-		return pack;
+		return pack as Package;
 	} catch (e) {
+		console.log(e);
 		return null;
 	}
 }
@@ -63,4 +65,14 @@ export function dependHash_To_nameVersionsObj(
 		{}
 	);
 	return nameToVersion;
+}
+
+export function handleHasCjsVersionObj(
+	obj: Record<string, string> | undefined
+) {
+	const newObj = obj || {};
+	Object.entries(obj || {}).forEach(([key, val]) => {
+		newObj[key] = val.split('/').pop()!;
+	});
+	return newObj;
 }

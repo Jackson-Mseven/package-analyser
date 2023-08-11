@@ -1,6 +1,6 @@
 import { type } from 'os';
-import { parentSybmol, pathSymbol } from './Symbol';
-import field from './field';
+import { parentSybmol, pathSymbol } from '../Symbol';
+import field from '../field';
 
 export type Package = {
 	name: string;
