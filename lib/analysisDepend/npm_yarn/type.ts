@@ -1,14 +1,7 @@
 import { type } from 'os';
 import { parentSybmol, pathSymbol } from '../Symbol';
 import field from '../field';
-
-export type Package = {
-	name: string;
-	version: string;
-	dependencies: Record<string, string>;
-	devDependencies: Record<string, string>;
-	[pathSymbol]: string;
-};
+import { Package } from '../type';
 
 export type VirtualFolder = {
 	file: Record<string, Package>;

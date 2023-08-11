@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import * as semver from 'semver';
-import { Package } from './npm_yarn/type';
+import { Package } from './type';
 import { pathSymbol } from './Symbol';
 
 /**

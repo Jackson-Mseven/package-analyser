@@ -1,6 +1,7 @@
 import * as fs from 'fs/promises';
 import path = require('path');
 import * as Panalyze from './type';
+import { Package } from '../type';
 import {
 	checkVersion,
 	getJsonFileObjPath,
@@ -62,9 +63,9 @@ const findDependFromNode_modules = (
 ) => {
 	const dirs = name.split('/');
 	const Vfolder = findTargetByDirs(node_modulesVF, dirs);
-	const pack = Vfolder?.file[field.packageJson] as Panalyze.Package;
+	const pack = Vfolder?.file[field.packageJson] as Package;
 	if (pack && pack.version && checkVersion(versionCondition, pack.version)) {
-		return [pack, Vfolder] as [Panalyze.Package, Panalyze.VirtualFolder];
+		return [pack, Vfolder] as [Package, Panalyze.VirtualFolder];
 	}
 	return null;
 };
@@ -118,7 +119,7 @@ const findDepend_ChildDepend = (
 		importName: string | null,
 		dependName: Panalyze.denpendType = field.dependencies
 	) {
-		const pack = virtualFolder.file[field.packageJson] as Panalyze.Package;
+		const pack = virtualFolder.file[field.packageJson] as Package;
 		const { name, version } = pack || {};
 		const nameVersion = nameVersionStringify(importName || name, version);
 
