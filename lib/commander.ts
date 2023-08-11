@@ -8,12 +8,12 @@ const dependencies: object = require(process.cwd().replace(/\\/g, '/') + "/packa
 const devDependencies: object = require(process.cwd().replace(/\\/g, '/') + "/package.json").devDependencies
 
 /**
- * @params {object} program：命令行工具
- * @params {string} version：版本号
+ * @param {object} program：命令行工具
+ * @param {string} version：版本号
  */
-module.exports = function (program: programType, version: string) {
+module.exports = function (program: programType, version: string, packageManagementTools: string) {
   program
     .command('analyze [depth] [jsonFile]') // 自定义 analyze 命令，接收可选参数 depth 和 jsonFile
     .description('analyze dependency packages') // 命令描述
-    .action(myAction(packageName, version, dependencies, devDependencies)) // 命令执行函数
+    .action(myAction(packageName, version, packageManagementTools, dependencies, devDependencies)) // 命令执行函数
 }
