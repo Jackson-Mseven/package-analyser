@@ -1,0 +1,72 @@
+* {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -khtml-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+button {
+  position: relative;
+  top: 2vh;
+  left: 5vw;
+  display: inline-block;
+  /* width: 100px; */
+  padding-left: 20px;
+  padding-right: 20px;
+  height: 40px;
+  border: 1px solid #666;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#backBtn {
+  width: 150px;
+}
+
+#backBtn,
+#polyline,
+#curve {
+  margin-left: 2vw;
+}
+
+#svg_div {
+  width: calc(90vw - 3px);
+  height: 85vh;
+  border: 1px solid #c0c4cc;
+  position: relative;
+  left: 5vw;
+  top: 5vh;
+}
+
+.link {
+  fill: none;
+  stroke: black;
+  stroke-width: 2px;
+  marker-end: url(#arrow);
+}
+
+.link-hover {
+  fill: none;
+  stroke: blue;
+  stroke-width: 5px;
+  marker-end: url(#arrow);
+}
+
+.node {
+  fill: rgba(255, 255, 255, 0.8);
+  stroke: black;
+  stroke-width: 1px;
+}
+
+.root {
+  fill: rgba(33, 33, 33, 0.9);
+  stroke: white;
+  stroke-width: 1px;
+}

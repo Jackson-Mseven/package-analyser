@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>show-2d</title>
+  <!-- 引入 css -->
+  <link rel="stylesheet" href="./index.css">
+  <!-- 引入 d3 -->
+  <script src="./d3.min.js"></script>
+</head>
+
+<body>
+  <div>
+    <button id="backRootBtn">返回根节点</button>
+    <button id="backBtn">返回上次触动节点</button>
+    <button id="polyline">折线图</button>
+    <button id="curve">曲线图</button>
+    <button id="dependencies">dependencies</button>
+    <button id="devDependencies">devDependencies</button>
+    <div id="svg_div"></div>
+  </div>
+  <!-- 引入 axios -->
+  <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.3.6/axios.js"></script>
+  <!-- 引入逻辑文件 -->
+  <script src="./index.js"></script>
+</body>
+
+</html>

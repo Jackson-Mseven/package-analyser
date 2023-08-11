@@ -1,49 +1,28 @@
-# eslint相关配置
+# 介绍
 
-```json
-{
-  "env": { // 运行环境
-    "browser": true, // 浏览器
-    "commonjs": true, // commonjs 模块化规范
-    "es2021": true // ES12
-  },
-  "extends": [ // 检查规范
-    "prettier" // prettier
-  ],
-  "parserOptions": { // 解析器
-    "ecmaVersion": "latest"
-  },
-  "plugins": [ // 插件
-    "react" // react
-  ],
-  "rules": {} // 规则
-}
-```
+Package-Analyze 是一个用于分析依赖的命令行工具，主要功能有：
 
+1.  分析当前项目生产环境下的依赖关系
+2.  分析当前项目开发环境下的依赖关系
+3.  分析当前项目生产环境下的各依赖大小
+4.  支持2D、3D展示依赖关系
+5.  支持可视化展示依赖大小
 
+# 使用
 
-# prettier相关配置
+1.  挂载命令
 
-```json
-{
-  "useTabs": true, // 允许使用 Tab 代替空格
-  "tabSize": 2, // 一个 Tab 等于 2 个空格
-  "semi": true, // 结尾使用分号
-  "singleQuote": true, // 使用单引号代替双引号
-  "trailingComma": "es5", // 只有 es5 中才在结尾加逗号
-  "bracketSpacing": true, // 对象括号两边用逗号隔开
-  "parser": "typescript" // 使用 ts 解析器
-}
-```
+    ```bash
+    npm link
+    ```
 
-# 指令配置
+2.  执行分析
 
-```json
-{
-  // 通过 npm link 即可将该指令挂载到全局，g
-  "bin": {
-    "analyze-cli": "./bin/index.js"
-  }
-}
-```
+    ```bash
+    /**
+     * @param { Integer | Infinity } depth：深度
+     * @param { string } jsonFile：输出的 JSON 文件路径
+     */
+    analyze-cli analyze [depth] [jsonFile]
+    ```
 
