@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import path = require('path');
 import * as Panalyze from './type';
-import { Package } from '../type';
+import { Package, DenpendType } from '../type';
 import {
 	checkVersion,
 	getJsonFileObjPath,
@@ -110,14 +110,14 @@ export const findDepend = (
 const findDepend_ChildDepend = (
 	virtualFolder: Panalyze.VirtualFolder,
 	depth: number,
-	dependName: Panalyze.denpendType
+	dependName: DenpendType
 ) => {
 	const hash: Record<string, Record<string, string>> = {};
 	function dfs(
 		virtualFolder: Panalyze.VirtualFolder,
 		/**递归深度 */ d: number,
 		importName: string | null,
-		dependName: Panalyze.denpendType = field.dependencies
+		dependName: DenpendType = field.dependencies
 	) {
 		const pack = virtualFolder.file[field.packageJson] as Package;
 		const { name, version } = pack || {};
@@ -147,15 +147,11 @@ const findDepend_ChildDepend = (
 //   debugger;
 // }
 // test();
-export default async function getDependHash(
-	depth: string,
-	dependName: Panalyze.denpendType = field.dependencies
+export default async function getNpm_YarnDependHash(
+	depth: number,
+	dependName: DenpendType = field.dependencies
 ) {
 	const VF = await getVirtualFolder(process.cwd());
-	const hash = findDepend_ChildDepend(
-		VF,
-		isNumberStr(depth) ? +depth : 1,
-		dependName
-	);
+	const hash = findDepend_ChildDepend(VF, depth, dependName);
 	return hash;
 }

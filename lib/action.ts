@@ -3,7 +3,7 @@ import {
 	dependHash_To_nameVersionsObj,
 	nameVersionParse,
 } from './analysisDepend/utils';
-import getDependHash from './analysisDepend/npm_yarn';
+import getDependHash from './analysisDepend/getDependHash';
 import * as fs from 'fs/promises';
 /**
  * 定义命令执行的回调函数
@@ -30,8 +30,12 @@ module.exports = function (
 	 */
 	return async function (depth: string, jsonFile: string) {
 		depth = depth || '1';
-		const dependHash = await getDependHash(depth);
-		const devPendHash = await getDependHash(depth, field.devDependencies);
+		const dependHash = await getDependHash(depth, packageManagementTools);
+		const devPendHash = await getDependHash(
+			depth,
+			packageManagementTools,
+			field.devDependencies
+		);
 		const dependToVersionsObj = dependHash_To_nameVersionsObj(dependHash);
 		const devDependToVersionsObj = dependHash_To_nameVersionsObj(devPendHash);
 		if (!jsonFile) {
@@ -46,6 +50,5 @@ module.exports = function (
 			};
 			fs.writeFile(jsonFile, JSON.stringify(dep, null, 2));
 		}
-		console.log(packageManagementTools);
 	};
 };

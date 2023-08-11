@@ -11,5 +11,3 @@ export type VirtualFolder = {
 		folderName?: string;
 	};
 };
-
-export type denpendType = field.dependencies | field.devDependencies;

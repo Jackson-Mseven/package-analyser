@@ -7,6 +7,8 @@ import {
 	handleHasCjsVersionObj,
 	nameVersionStringify,
 } from '../utils';
+import field from '../field';
+import { DenpendType } from '../type';
 function getPnpmYamlObj() {
 	const pnpm_yamlPath = path.join(
 		process.cwd().replace(/\\/g, '/'),
@@ -20,7 +22,9 @@ function getPnpmYamlObj() {
 	}
 }
 
-async function getPnpmDependHash() {
+async function getPnpmAllDependHash(
+	depnedType: DenpendType = field.dependencies
+) {
 	const yamlObj = getPnpmYamlObj();
 	const hash: Record<string, Record<string, string>> = {};
 	Object.entries(yamlObj?.packages || {}).forEach(([key, value]) => {
@@ -34,8 +38,26 @@ async function getPnpmDependHash() {
 	});
 	//获取用户包的名字
 	const entryPack = (await getJsonFileObjPath('./package.json'))!;
-	hash[nameVersionStringify(entryPack.name, entryPack.version)] =
-		handleHasCjsVersionObj(yamlObj?.dependencies || {});
+	const nameVersion = nameVersionStringify(entryPack.name, entryPack.version);
+	hash[nameVersion] = handleHasCjsVersionObj(yamlObj?.[depnedType] || {});
+	return hash;
+}
+
+async function getPnpmDependHash(
+	/** 递归的最大深度*/ d: number,
+	depnedType: DenpendType = field.dependencies
+) {
+	const AllDependHash = await getPnpmAllDependHash(depnedType);
+	const entryPack = (await getJsonFileObjPath('./package.json'))!;
+	const hash: Record<string, Record<string, string>> = {};
+	function dfs(depth: number, nameVersion: string) {
+		if (depth > d || hash[nameVersion]) return;
+		hash[nameVersion] = AllDependHash[nameVersion];
+		Object.entries(hash[nameVersion] || {}).forEach(([name, version]) => {
+			dfs(depth + 1, nameVersionStringify(name, version));
+		});
+	}
+	dfs(1, nameVersionStringify(entryPack.name, entryPack.version));
 	return hash;
 }
 
