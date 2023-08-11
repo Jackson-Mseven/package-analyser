@@ -38,17 +38,17 @@ module.exports = function (
 		);
 		const dependToVersionsObj = dependHash_To_nameVersionsObj(dependHash);
 		const devDependToVersionsObj = dependHash_To_nameVersionsObj(devPendHash);
+		const data = {
+			dependHash,
+			devPendHash,
+			dependToVersionsObj,
+			devDependToVersionsObj,
+		};
 		if (!jsonFile) {
 			const server: Function = require('./server');
-			server();
+			server(data);
 		} else {
-			const dep = {
-				dependHash,
-				devPendHash,
-				dependToVersionsObj,
-				devDependToVersionsObj,
-			};
-			fs.writeFile(jsonFile, JSON.stringify(dep, null, 2));
+			fs.writeFile(jsonFile, JSON.stringify(data, null, 2));
 		}
 	};
 };

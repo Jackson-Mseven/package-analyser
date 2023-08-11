@@ -10,3 +10,10 @@ export type Package = {
 };
 
 export type DenpendType = field.dependencies | field.devDependencies;
+
+export type Data = {
+	dependHash: Record<string, Record<string, string>>;
+	devPendHash: Record<string, Record<string, string>>;
+	dependToVersionsObj: Record<string, string[]>;
+	devDependToVersionsObj: Record<string, string[]>;
+};
