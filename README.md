@@ -10,13 +10,19 @@ Package-Analyze 是一个用于分析依赖的命令行工具，主要功能有�
 
 # 使用
 
-1.  挂载命令
+1.  解析TypeScrip
+
+    ```bash
+    tsc
+    ```
+
+3.  挂载命令
 
     ```bash
     npm link
     ```
 
-2.  执行分析
+4.  执行分析
 
     ```bash
     /**
