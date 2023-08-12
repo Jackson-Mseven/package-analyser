@@ -5,6 +5,7 @@ import {
 } from './analysisDepend/utils';
 import getDependHash from './analysisDepend/getDependHash';
 import * as fs from 'fs/promises';
+import findHoopAndShow from './findHoopAndShow';
 /**
  * 定义命令执行的回调函数
  */
@@ -29,7 +30,6 @@ module.exports = function (
 	 * @param {string} jsonFile：导出的 JSON 文件路径
 	 */
 	return async function (depth: string, jsonFile: string) {
-		depth = depth || '1';
 		const dependHash = await getDependHash(depth, packageManagementTools);
 		const devPendHash = await getDependHash(
 			depth,
@@ -38,11 +38,15 @@ module.exports = function (
 		);
 		const dependToVersionsObj = dependHash_To_nameVersionsObj(dependHash);
 		const devDependToVersionsObj = dependHash_To_nameVersionsObj(devPendHash);
+		const hoop = findHoopAndShow(dependHash);
+		const devHoop = findHoopAndShow(dependHash);
 		const data = {
 			dependHash,
 			devPendHash,
 			dependToVersionsObj,
 			devDependToVersionsObj,
+			hoop: [hoop[0], Object.fromEntries(hoop[1])],
+			devHoop: [devHoop[0], Object.fromEntries(devHoop[1])],
 		};
 		if (!jsonFile) {
 			const server: Function = require('./server');

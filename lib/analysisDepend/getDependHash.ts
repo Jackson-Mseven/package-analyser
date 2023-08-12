@@ -9,7 +9,9 @@ export default async function (
 	packageManagementTools: string,
 	depnedType: DenpendType = field.dependencies
 ) {
-	const d = isNumberStr(depth) ? +depth : 1e9;
+	let d: number;
+	if (!isNumberStr(depth) || depth == 'Infinity') d = 1e9;
+	else d = +depth;
 	if (packageManagementTools == 'pnpm') {
 		return await getPnpmDependHash(d, depnedType);
 	} else {
