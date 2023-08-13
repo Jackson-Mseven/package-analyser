@@ -16,15 +16,12 @@
     async function getData() {
       await axios.get('http://localhost:5005/getData').then(res => {
         data = res.data
-        alert(data);
+        console.log(data);
       }).catch(err => {
         alert(err)
       })
     }
     getData()
-    setTimeout(() => {
-      console.log(data);
-    }, 1000)
   </script>
 </body>
 
