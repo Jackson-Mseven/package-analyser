@@ -38,13 +38,21 @@
   position: relative;
   position: absolute;
   top: 3%;
-  right: -30%;
-  width: 30%;
+  right: -15%;
+  width: 15%;
   height: 94%;
   background: rgba(0,0,0,0.5);
   border: 0;
   border-radius: 10px;
   transition: 1s;
+  color: white;
+}
+
+#aside li{
+  margin-left: -30px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #aside div{
@@ -60,7 +68,7 @@
   transition: 1s;
 }
 
-#aside #arrow{
+#aside #open-close{
   display: inline-block;
   width: 100%;
   height: 100%;
@@ -74,4 +82,18 @@
 
 .arrow-open{
   transform: rotate(180deg);
+}
+
+label{
+  display: block;
+  margin-top: 10px;
+  text-align: center;
+}
+
+input[type="search"]{
+  width: 90%;
+  height: 20px;
+  border: 0;
+  border-radius: 5px;
+  outline: none;
 }

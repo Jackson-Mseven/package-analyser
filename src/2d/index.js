@@ -4,18 +4,14 @@ async function getData() {
   await axios.get('http://localhost:5005/getData').then(res => {
     data = res.data;
     show(JSON.parse(JSON.stringify(data)))
-  }).catch(err => {
-    console.log('出现错误：', err);
-  })
+  }).catch(err => console.log('出现错误：', err))
 }
 getData();
 
 function show(res) {
   const smallGrid = 50;
   const Grid = 500;
-  const MARGIN_LEFT = 100;
-  const MARGIN_TOP = 50;
-  let isPolyline = false; // 判断是折线还是曲线图
+  let isPolyline = false; // true: 折线 ;false: 曲线
 
   // 处理数据
   const json = res;
@@ -24,21 +20,17 @@ function show(res) {
     let nodes = [];
     let links = [];
     let nodeIndex = 0;
-
     const processNode = (id, value, parent = null) => {
       const nodeId = id.trim();
-
       if (!nodes.find((node) => node.id == nodeId)) {
         nodeIndex++;
         nodes.push({ id: nodeId, index: nodeIndex });
       }
-
       if (parent) {
         const sourceNodeId = parent.trim();
         const targetNodeId = nodeId;
-        links.push({ source: sourceNodeId, target: targetNodeId });
+        links.push({ source: sourceNodeId, target: targetNodeId, value: Math.random()});
       }
-
       if (typeof value == 'object') {
         for (let key in value) {
           const childId = key.trim();
@@ -49,18 +41,34 @@ function show(res) {
               nodeIndex++;
               nodes.push({ id: targetNodeId, index: nodeIndex });
             }
-            links.push({ source: nodeId, target: targetNodeId });
+            links.push({ source: nodeId, target: targetNodeId, value: Math.random()});
           } else processNode(childId, childValue, nodeId);
         }
       }
     };
-
     for (let key in json) processNode(key, json[key]);
     return { nodes, links };
   };
-  const dependHash = convertJsonToArrays(json.dependHash);
-  const devPendHash = convertJsonToArrays(json.devPendHash);
-
+  let dependHash;
+  let devPendHash;
+  let dependToVersionsObj;
+  let devDependToVersionsObj;
+  if (json == true) {
+    dependHash = JSON.parse(localStorage.getItem('dependHash'));
+    devPendHash = JSON.parse(localStorage.getItem('devPendHash'));
+    dependToVersionsObj = JSON.parse(localStorage.getItem('dependToVersionsObj'));
+    devDependToVersionsObj = JSON.parse(localStorage.getItem('devDependToVersionsObj'));
+  }
+  else {
+    dependHash = convertJsonToArrays(json.dependHash);
+    devPendHash = convertJsonToArrays(json.devPendHash);
+    dependToVersionsObj = json.dependToVersionsObj;
+    devDependToVersionsObj = json.devDependToVersionsObj;
+    localStorage.setItem("dependHash", JSON.stringify(dependHash));
+    localStorage.setItem("devPendHash", JSON.stringify(devPendHash));
+    localStorage.setItem("dependToVersionsObj", JSON.stringify(dependToVersionsObj));
+    localStorage.setItem("devDependToVersionsObj", JSON.stringify(devDependToVersionsObj));
+  }
   //#region
   // 添加svg元素
   d3.select('#svg_div')
@@ -107,7 +115,7 @@ function show(res) {
     .attr('fill', 'url(#grid)');
   //#endregion
 
-  const init = (flag, data) => {
+  const init = (flag, data) => { // true: 折线 ;false: 曲线
     let cachedRootX = null;
     let cachedRootY = null; // 存储根节点移动距离
     let cachedX = null; // 存储普通节点移动距离
@@ -118,7 +126,6 @@ function show(res) {
     // 拖拽缩放
     const zoomed = () => {
       d3.select('#graph').attr('transform', d3.event.transform);
-
       k = d3.event.transform.k;
       // 栅格缩放
       d3.select('#smallGrid')
@@ -146,11 +153,9 @@ function show(res) {
       .append('g')
       .attr('id', 'graph')
       .attr('style', 'display:none');
-
     // 创建力导向图容器
     const g = d3.select('#graph').append('g');
     let marker;
-
     // 获得文本宽高
     const getTextWidth = (text) => {
       const canvas = document.createElement('canvas');
@@ -165,7 +170,6 @@ function show(res) {
       const metrics = context.measureText('M');
       return (metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent);
     };
-
     const nodePadding = 20; // 文本宽度
     if (flag) {
       // 连线（折线）
@@ -177,8 +181,7 @@ function show(res) {
         .attr('markerWidth', '16')
         .attr('markerHeight', '16')
         .attr('viewBox', '0 0 12 12')
-        // 调整箭头的位置偏移量
-        .attr('refX', '15')
+        .attr('refX', '15') // 调整箭头的位置偏移量
         .attr('refY', '5.5')
         .attr('orient', 'auto');
     } else if (!flag) {
@@ -195,7 +198,6 @@ function show(res) {
         .attr('refY', '5.4')
         .attr('orient', 'auto');
     }
-
     // 箭头
     marker
       .append('path')
@@ -460,7 +462,7 @@ function show(res) {
       const svg = d3.select('#graph');
       svg.remove();
       isPolyline = true;
-      init(isPolyline,inputData);
+      init(isPolyline, inputData);
     }
   });
 
@@ -471,7 +473,7 @@ function show(res) {
       const svg = d3.select('#graph');
       svg.remove();
       isPolyline = false;
-      init(isPolyline,inputData);
+      init(isPolyline, inputData);
     }
   });
   const dependencies = document.querySelector("#dependencies")
@@ -484,6 +486,7 @@ function show(res) {
       svg.remove();
       inputData = dependHash;
       init(isPolyline, inputData);
+      showDepend(dependToVersionsObj);
     }
   });
 
@@ -495,11 +498,14 @@ function show(res) {
       svg.remove();
       inputData = devPendHash;
       init(isPolyline, inputData);
+      console.log(devDependToVersionsObj);
+      showDepend(devDependToVersionsObj);
     }
   });
   dependencies.disabled = true;
   devDependencies.disabled = false;
   polyline.click();
+  showDepend(dependToVersionsObj);
 }
 
 const arrow = document.querySelector('#aside div');
@@ -532,3 +538,48 @@ mode.addEventListener('click', () => {
   }
   body.classList.toggle('dark');
 })
+
+// 侧边栏版本展示
+const showDepend = (data) => {
+     const aside = document.querySelector('#aside');
+     const ulElement = aside.querySelector('ul'); // 查找aside下的ul元素
+     if (ulElement) {
+       // 如果找到 <ul> 元素，则从父元素中移除
+       ulElement.parentNode.removeChild(ulElement);
+     }
+
+     const ul = document.createElement('ul');
+     for (let i in data) {
+       const li = document.createElement('li');
+       let version = data[i];
+
+       // 检查版本号是否为数组，如果是数组则表示存在多个版本号
+       if (Array.isArray(version)) {
+         // 检查版本号数量，如果只有一个版本号，则将版本号直接展示在一级目录中
+         if (version.length === 1) {
+           li.textContent = `${i} - ${version[0]}`;
+         } else {
+           // 如果有多个版本号，则在一级目录下创建二级目录，并使用 ... 表示无法展示的版本号
+           const span = document.createElement('span');
+           span.textContent = i;
+           li.appendChild(span);
+
+           const ul2 = document.createElement('ul');
+           for (let j = 0; j < version.length; j++) {
+             const li2 = document.createElement('li');
+             li2.textContent = version[j];
+             ul2.appendChild(li2);
+           }
+
+           li.appendChild(ul2);
+         }
+       } else {
+         // 如果版本号不是数组，则直接在一级目录中展示版本号
+         li.textContent = `${i} - ${version}`;
+       }
+
+       ul.appendChild(li);
+     }
+
+     aside.appendChild(ul);
+}
