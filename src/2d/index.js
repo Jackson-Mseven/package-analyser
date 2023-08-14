@@ -3,8 +3,7 @@ let data;
 async function getData() {
   await axios.get('http://localhost:5005/getData').then(res => {
     data = res.data;
-    console.log(data);
-    show(JSON.parse(JSON.stringify(data.dependHash)))
+    show(JSON.parse(JSON.stringify(data)))
   }).catch(err => {
     console.log('出现错误：', err);
   })
@@ -46,7 +45,10 @@ function show(res) {
           const childValue = value[key].trim();
           if (typeof childValue == 'string') {
             const targetNodeId = childId + ' : ' + childValue;
-            if (!nodes.find((node) => node.id == targetNodeId)) nodes.push({ id: targetNodeId });
+            if (!nodes.find((node) => node.id == targetNodeId)) {
+              nodeIndex++;
+              nodes.push({ id: targetNodeId, index: nodeIndex });
+            }
             links.push({ source: nodeId, target: targetNodeId });
           } else processNode(childId, childValue, nodeId);
         }
@@ -56,7 +58,8 @@ function show(res) {
     for (let key in json) processNode(key, json[key]);
     return { nodes, links };
   };
-  const data = convertJsonToArrays(json);
+  const dependHash = convertJsonToArrays(json.dependHash);
+  const devPendHash = convertJsonToArrays(json.devPendHash);
 
   //#region
   // 添加svg元素
@@ -104,7 +107,7 @@ function show(res) {
     .attr('fill', 'url(#grid)');
   //#endregion
 
-  const init = (flag) => {
+  const init = (flag, data) => {
     let cachedRootX = null;
     let cachedRootY = null; // 存储根节点移动距离
     let cachedX = null; // 存储普通节点移动距离
@@ -446,6 +449,7 @@ function show(res) {
   };
 
   // 切换格式
+  let inputData = dependHash
   const polyline = document.querySelector('#polyline');
   const curve = document.querySelector('#curve');
 
@@ -456,7 +460,7 @@ function show(res) {
       const svg = d3.select('#graph');
       svg.remove();
       isPolyline = true;
-      init(isPolyline);
+      init(isPolyline,inputData);
     }
   });
 
@@ -467,9 +471,64 @@ function show(res) {
       const svg = d3.select('#graph');
       svg.remove();
       isPolyline = false;
-      init(isPolyline);
+      init(isPolyline,inputData);
+    }
+  });
+  const dependencies = document.querySelector("#dependencies")
+  const devDependencies = document.querySelector("#devDependencies")
+  dependencies.addEventListener('click', () => {
+    if (inputData == devPendHash) {
+      dependencies.disabled = true;
+      devDependencies.disabled = false;
+      const svg = d3.select('#graph');
+      svg.remove();
+      inputData = dependHash;
+      init(isPolyline, inputData);
     }
   });
 
+  devDependencies.addEventListener('click', () => {
+    if (inputData == dependHash) {
+      dependencies.disabled = false;
+      devDependencies.disabled = true;
+      const svg = d3.select('#graph');
+      svg.remove();
+      inputData = devPendHash;
+      init(isPolyline, inputData);
+    }
+  });
+  dependencies.disabled = true;
+  devDependencies.disabled = false;
   polyline.click();
 }
+
+const arrow = document.querySelector('#aside div');
+arrow.addEventListener('click', () => {
+  const aside = document.querySelector('#aside');
+  aside.classList.toggle('open');
+  arrow.classList.toggle('arrow-open');
+})
+
+
+const ThreeD = document.querySelector('#ThreeD');
+ThreeD.addEventListener('click', () => {
+  location.href = "../3d/index.html";
+})
+
+const mode = document.querySelector('#mode');
+mode.addEventListener('click', () => {
+  let body = document.body;
+  let smallGrid = document.querySelector('defs #smallGrid path');
+  let grid = document.querySelector('defs #grid path');
+  if (body.classList.contains('dark')){
+    mode.innerHTML = `夜间模式`;
+    smallGrid.style.stroke = "gray";
+    grid.style.stroke = "gray";
+  }
+  else {
+    mode.innerHTML = `白天模式`;
+    smallGrid.style.stroke = "white";
+    grid.style.stroke = "white";
+  }
+  body.classList.toggle('dark');
+})

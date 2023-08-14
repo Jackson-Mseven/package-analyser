@@ -1,48 +1,11 @@
-* {
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  -khtml-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-button {
-  position: relative;
-  top: 2vh;
-  left: 5vw;
-  display: inline-block;
-  /* width: 100px; */
-  padding-left: 20px;
-  padding-right: 20px;
-  height: 40px;
-  border: 1px solid #666;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-#backBtn {
-  width: 150px;
-}
-
-#backBtn,
-#polyline,
-#curve {
-  margin-left: 2vw;
-}
-
 #svg_div {
-  width: calc(90vw - 3px);
-  height: 85vh;
+  position: relative;
+  width: 90vw;
+  height: 90vh;
   border: 1px solid #c0c4cc;
   position: relative;
   left: 5vw;
-  top: 5vh;
+  overflow: hidden;
 }
 
 .link {
@@ -69,4 +32,46 @@ button {
   fill: rgba(33, 33, 33, 0.9);
   stroke: white;
   stroke-width: 1px;
+}
+
+#aside{
+  position: relative;
+  position: absolute;
+  top: 3%;
+  right: -30%;
+  width: 30%;
+  height: 94%;
+  background: rgba(0,0,0,0.5);
+  border: 0;
+  border-radius: 10px;
+  transition: 1s;
+}
+
+#aside div{
+  position: absolute;
+  top: 5px;
+  left: -30px;
+  width: 25px;
+  height: 30px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(0,0,0,0.5);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 1s;
+}
+
+#aside #arrow{
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  background: url('./asset/arrow.png') 5px no-repeat;
+  background-size: cover;
+}
+
+.open{
+ right:1% !important;
+}
+
+.arrow-open{
+  transform: rotate(180deg);
 }
