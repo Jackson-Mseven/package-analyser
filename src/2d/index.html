@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2D依赖关系图</title>
+  <!-- 引入 css -->
+  <link rel="stylesheet" href="../base.css">
+  <link rel="stylesheet" href="./index.css">
+  <!-- 引入 d3 -->
+  <script type="text/javascript" src="http://d3js.org/d3.v5.min.js"></script>
+</head>
+
+<body>
+  <div>
+    <button id="mode">夜间模式</button>
+    <button id="ThreeD">3D</button>
+    <div class="line"></div>
+    <button id="dependencies">dependencies</button>
+    <button id="devDependencies">devDependencies</button>
+    <div class="line"></div>
+    <button id="polyline">折线图</button>
+    <button id="curve">曲线图</button>
+    <div class="line"></div>
+    <button id="backRootBtn">返回根节点</button>
+    <button id="backBtn">返回上次触动节点</button>
+    <div class="line"></div>
+    <div class="status">有环</div>
+    <button class="ring">点击展示</button>
+
+    <div id="svg_div">
+      <div id="aside">
+        <div><span id="open-close"></span></div>
+        <label>
+          Search:
+          <input type="search" placeholder="查找节点" />
+        </label>
+      </div>
+    </div>
+  </div>
+  <!-- 引入 axios -->
+  <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.3.6/axios.js"></script>
+  <!-- 引入逻辑文件 -->
+  <script src="./index.js"></script>
+</body>
+
+</html>
