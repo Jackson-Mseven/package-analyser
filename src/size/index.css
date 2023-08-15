@@ -1,0 +1,21 @@
+#back {
+  transform: translateY(40px);
+  padding: 20px 40px;
+  font-size: 26px;
+}
+
+#pie {
+  position: absolute;
+  top: 10vh;
+  left: 10vh;
+  width: 80vh;
+  height: 80vh;
+}
+
+#bar {
+  position: absolute;
+  top: 10vh;
+  right: 10vh;
+  width: 80vh;
+  height: 80vh;
+}

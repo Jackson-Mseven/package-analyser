@@ -32,7 +32,8 @@ const getVirtualFolder = async (folderPath: string) => {
 					if (!pack) continue;
 					virtualFolder.file[filename] = pack;
 				} catch (e) {
-					console.log(fileDir);
+					//这里是读取的包有问题时不做处理
+					// console.log(fileDir);
 				}
 			}
 

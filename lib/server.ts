@@ -39,6 +39,7 @@ module.exports = function (data: Data) {
   app.listen(5005, (err: object) => {
     if (err) {
       console.log('服务器启动失败');
+      return err;
     }
     console.log('服务器启动了');
     console.log('http://localhost:5005/2d/index.html');

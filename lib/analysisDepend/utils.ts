@@ -43,7 +43,7 @@ export async function getJsonFileObjPath(path: string) {
 		pack[pathSymbol] = path;
 		return pack as Package;
 	} catch (e) {
-		console.log(e);
+		//这里暂时不做处理
 		return null;
 	}
 }
