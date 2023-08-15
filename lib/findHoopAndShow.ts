@@ -100,7 +100,7 @@ export default function (data: Record<string, Record<string, string>>) {
 
     const hoop = new Map();
     for (const curPackage of Array.from(noVisited.values())) {
-      hoop.set(curPackage, directedGraph.get(curPackage));
+      hoop.set(curPackage, dataMap.get(curPackage));
     }
     return [flag, Object.fromEntries(hoop)];
   }
