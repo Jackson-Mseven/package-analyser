@@ -53,22 +53,16 @@ function show(res) {
   let devPendHash;
   let dependToVersionsObj;
   let devDependToVersionsObj;
-  if (json == true) {
-    dependHash = JSON.parse(localStorage.getItem('dependHash'));
-    devPendHash = JSON.parse(localStorage.getItem('devPendHash'));
-    dependToVersionsObj = JSON.parse(localStorage.getItem('dependToVersionsObj'));
-    devDependToVersionsObj = JSON.parse(localStorage.getItem('devDependToVersionsObj'));
-  }
-  else {
-    dependHash = convertJsonToArrays(json.dependHash);
-    devPendHash = convertJsonToArrays(json.devPendHash);
-    dependToVersionsObj = json.dependToVersionsObj;
-    devDependToVersionsObj = json.devDependToVersionsObj;
-    localStorage.setItem("dependHash", JSON.stringify(dependHash));
-    localStorage.setItem("devPendHash", JSON.stringify(devPendHash));
-    localStorage.setItem("dependToVersionsObj", JSON.stringify(dependToVersionsObj));
-    localStorage.setItem("devDependToVersionsObj", JSON.stringify(devDependToVersionsObj));
-  }
+
+  dependHash = convertJsonToArrays(json.dependHash);
+  devPendHash = convertJsonToArrays(json.devPendHash);
+  dependToVersionsObj = json.dependToVersionsObj;
+  devDependToVersionsObj = json.devDependToVersionsObj;
+  sessionStorage.setItem("dependHash", JSON.stringify(dependHash));
+  sessionStorage.setItem("devPendHash", JSON.stringify(devPendHash));
+  sessionStorage.setItem("dependToVersionsObj", JSON.stringify(dependToVersionsObj));
+  sessionStorage.setItem("devDependToVersionsObj", JSON.stringify(devDependToVersionsObj));
+
   //#region
   // 添加svg元素
   d3.select('#svg_div')

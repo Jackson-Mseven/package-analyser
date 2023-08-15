@@ -7,9 +7,9 @@ function getData(flag) {
      //#endregion
 	};
 	if (flag == 1)
-		render(JSON.parse(localStorage.getItem('dependHash')));
+		render(JSON.parse(sessionStorage.getItem('dependHash')));
 	else if (flag == 2)
-		render(JSON.parse(localStorage.getItem('devPendHash')));
+		render(JSON.parse(sessionStorage.getItem('devPendHash')));
 }
 getData(1);
 
