@@ -55,11 +55,18 @@ export default function (data: Record<string, Record<string, string>>) {
 
         dependenciesArr.push(node); // 添加依赖
         indegree.set(node, (indegree.get(node) || 0) + 1); // 记录入度
+        noVisited.add(node);
       }
 
       // 将对象转换为数组
       directedGraph.set(curPackage, dependenciesArr);
     }
+    Array.from(indegree.keys()).forEach(item => {
+      if (!directedGraph.has(item)) {
+        directedGraph.set(item, [])
+      }
+    })
+
     return { directedGraph, indegree, noVisited };
   }
 
@@ -100,7 +107,7 @@ export default function (data: Record<string, Record<string, string>>) {
 
     const hoop = new Map();
     for (const curPackage of Array.from(noVisited.values())) {
-      hoop.set(curPackage, dataMap.get(curPackage));
+      hoop.set(curPackage, directedGraph.get(curPackage));
     }
     return [flag, Object.fromEntries(hoop)];
   }

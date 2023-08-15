@@ -18,9 +18,7 @@ button {
   left: 5vw;
   display: inline-block;
   margin-bottom: 10px;
-  padding-left: 20px;
-  padding-right: 20px;
-  height: 40px;
+  padding: 15px 20px;
   border: 1px solid #dcdfe6;
   background-color: #fff;
   color: #606266;
@@ -28,8 +26,8 @@ button {
   cursor: pointer;
 }
 
-.dark{
-  background: rgba(0,0,0,0.5);
+.dark {
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .line {

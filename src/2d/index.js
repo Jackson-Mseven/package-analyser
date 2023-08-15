@@ -1,10 +1,7 @@
 // 获取数据
-let data;
 async function getData() {
   await axios.get('http://localhost:5005/getData').then(res => {
-    data = res.data;
-    console.log(data);
-    show(JSON.parse(JSON.stringify(data)))
+    show(JSON.parse(JSON.stringify(res.data)))
   }).catch(err => console.log('出现错误：', err))
 }
 getData();
@@ -63,6 +60,10 @@ const show = (res) => {
   sessionStorage.setItem("devPendHash", JSON.stringify(devPendHash));
   sessionStorage.setItem("dependToVersionsObj", JSON.stringify(dependToVersionsObj));
   sessionStorage.setItem("devDependToVersionsObj", JSON.stringify(devDependToVersionsObj));
+  sessionStorage.setItem("dependencyHoop", JSON.stringify(res.dependencyHoop));
+  sessionStorage.setItem("devependencyHoop", JSON.stringify(res.devependencyHoop));
+  sessionStorage.setItem("dependentSizes", JSON.stringify(res.dependentSizes));
+
 
   //#region
   // 添加svg元素
@@ -616,3 +617,8 @@ if (document.querySelector(`.status`).innerText === '有环') {
     showRingBtn.innerHTML = isOn ? '取消展示' : '点击展示';
   })
 }
+
+const sizeBtn = document.querySelector('#size')
+sizeBtn.addEventListener('click', (e) => {
+  location.href = '../size/index.html'
+})
