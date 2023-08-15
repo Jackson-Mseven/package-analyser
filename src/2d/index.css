@@ -68,14 +68,7 @@
   color: white;
 }
 
-#aside li{
-  margin-left: -30px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-#aside div{
+#aside .arrow{
   position: absolute;
   top: 5px;
   left: -30px;
@@ -106,7 +99,7 @@
 
 label{
   display: block;
-  margin-top: 10px;
+  margin: 10px 0;
   text-align: center;
 }
 
@@ -116,4 +109,41 @@ input[type="search"]{
   border: 0;
   border-radius: 5px;
   outline: none;
+}
+
+#aside .content{
+  position: absolute;
+  top: 60px;
+  width: 92%;
+  height: 85%;
+	overflow-x: hidden;
+	overflow-y: auto;
+  -ms-overflow-style: none; /* ie10+ */
+  overflow: -moz-scrollbars-none;  /* firefox */
+}
+
+ /* chrome 和 safari */
+ #aside .content::-webkit-scrollbar {
+  width: 0 !important;
+}
+
+#aside li{
+  margin-left: -20px;
+  margin-bottom: 5px;
+  padding: 2px 15px;
+  border-radius: 5px;
+  background: rgba(2555,255,255,0.45);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 1.2em;
+  cursor: pointer;
+}
+
+#aside li li{
+  width: 90%;
+  background: #409eff;
+  font-size: 0.7em;
+  text-align: center;
 }
