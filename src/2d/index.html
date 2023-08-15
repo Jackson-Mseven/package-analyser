@@ -14,14 +14,21 @@
 
 <body>
   <div>
-    <button id="backRootBtn">返回根节点</button>
-    <button id="backBtn">返回上次触动节点</button>
-    <button id="polyline">折线图</button>
-    <button id="curve">曲线图</button>
+    <button id="mode">夜间模式</button>
+    <button id="ThreeD">3D</button>
+    <div class="line"></div>
     <button id="dependencies">dependencies</button>
     <button id="devDependencies">devDependencies</button>
-    <button id="ThreeD">3D</button>
-    <button id="mode">夜间模式</button>
+    <div class="line"></div>
+    <button id="polyline">折线图</button>
+    <button id="curve">曲线图</button>
+    <div class="line"></div>
+    <button id="backRootBtn">返回根节点</button>
+    <button id="backBtn">返回上次触动节点</button>
+    <div class="line"></div>
+    <div class="status">有环</div>
+    <button class="ring">点击展示</button>
+
     <div id="svg_div">
       <div id="aside">
         <div><span id="open-close"></span></div>

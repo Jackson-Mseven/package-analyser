@@ -8,7 +8,7 @@ async function getData() {
 }
 getData();
 
-function show(res) {
+const show = (res) => {
   const smallGrid = 50;
   const Grid = 500;
   let isPolyline = false; // true: 折线 ;false: 曲线
@@ -445,61 +445,80 @@ function show(res) {
   };
 
   // 切换格式
-  let inputData = dependHash
+  let inputData = dependHash;
   const polyline = document.querySelector('#polyline');
   const curve = document.querySelector('#curve');
 
   polyline.addEventListener('click', () => {
     if (!isPolyline) {
-      polyline.disabled = true;
-      curve.disabled = false;
       const svg = d3.select('#graph');
       svg.remove();
       isPolyline = true;
       init(isPolyline, inputData);
+      toggleMode(polyline);
     }
   });
 
   curve.addEventListener('click', () => {
     if (isPolyline) {
-      polyline.disabled = false;
-      curve.disabled = true;
       const svg = d3.select('#graph');
       svg.remove();
       isPolyline = false;
       init(isPolyline, inputData);
+      toggleMode(curve);
     }
   });
   const dependencies = document.querySelector("#dependencies")
   const devDependencies = document.querySelector("#devDependencies")
   dependencies.addEventListener('click', () => {
     if (inputData == devPendHash) {
-      dependencies.disabled = true;
-      devDependencies.disabled = false;
       const svg = d3.select('#graph');
       svg.remove();
       inputData = dependHash;
       init(isPolyline, inputData);
       showDepend(dependToVersionsObj);
+      toggleMode(dependencies);
     }
   });
 
   devDependencies.addEventListener('click', () => {
     if (inputData == dependHash) {
-      dependencies.disabled = false;
-      devDependencies.disabled = true;
       const svg = d3.select('#graph');
       svg.remove();
       inputData = devPendHash;
       init(isPolyline, inputData);
-      console.log(devDependToVersionsObj);
       showDepend(devDependToVersionsObj);
+      toggleMode(devDependencies);
     }
   });
-  dependencies.disabled = true;
-  devDependencies.disabled = false;
+  toggleMode(dependencies);
   polyline.click();
   showDepend(dependToVersionsObj);
+  if (!localStorage.getItem('mode')) localStorage.setItem('mode', 'day');
+  else changedMode(false);
+}
+
+const toggleMode = (el) => {
+  const dependencies = document.querySelector(`#dependencies`);
+  const devDependencies = document.querySelector(`#devDependencies`);
+  const polyline = document.querySelector(`#polyline`);
+  const curve = document.querySelector(`#curve`);
+
+  if (['dependencies', 'devDependencies'].includes(el.id)) {
+      dependencies.style.backgroundColor = 'white';
+      dependencies.style.color = '#606266';
+      devDependencies.style.backgroundColor = 'white';
+      devDependencies.style.color = '#606266';
+      el.style.backgroundColor = '#409eff';
+      el.style.color = 'white';
+  } else if (['polyline', 'curve'].includes(el.id)) {
+      polyline.style.backgroundColor = 'white';
+      polyline.style.color = '#606266';
+      curve.style.backgroundColor = 'white';
+      curve.style.color = '#606266';
+      el.style.backgroundColor = '#409eff';
+      el.style.color = 'white';
+  }
 }
 
 const arrow = document.querySelector('#aside div');
@@ -515,22 +534,31 @@ ThreeD.addEventListener('click', () => {
   location.href = "../3d/index.html";
 })
 
-const mode = document.querySelector('#mode');
-mode.addEventListener('click', () => {
+const changedMode = (init = true) => {
   let body = document.body;
   let smallGrid = document.querySelector('defs #smallGrid path');
   let grid = document.querySelector('defs #grid path');
-  if (body.classList.contains('dark')){
+  if (localStorage.getItem('mode') == 'day') {
     mode.innerHTML = `夜间模式`;
-    smallGrid.style.stroke = "gray";
-    grid.style.stroke = "gray";
+    smallGrid.setAttribute("stroke", "gray");
+    grid.setAttribute("stroke", "gray");
+    document.querySelector('.status').style.color = "black";
   }
-  else {
+  else if (localStorage.getItem('mode') == 'dark') {
     mode.innerHTML = `白天模式`;
-    smallGrid.style.stroke = "white";
-    grid.style.stroke = "white";
+    smallGrid.setAttribute("stroke", "white");
+    grid.setAttribute("stroke", "white");
+    document.querySelector('.status').style.color = "white";
   }
-  body.classList.toggle('dark');
+  if (init) body.classList.toggle('dark');
+  else if (!init && localStorage.getItem('mode') == 'dark') body.classList.add('dark'); //初始化时保存的是夜间模式更新背景色
+}
+
+const mode = document.querySelector('#mode');
+mode.addEventListener('click', () => {
+  if (localStorage.getItem('mode') == 'dark') localStorage.setItem('mode', 'day');
+  else if (localStorage.getItem('mode') == 'day') localStorage.setItem('mode', 'dark');
+  changedMode();
 })
 
 // 侧边栏版本展示
@@ -576,4 +604,14 @@ const showDepend = (data) => {
      }
 
      aside.appendChild(ul);
+}
+
+const showRingBtn = document.querySelector(`.ring`);
+if (document.querySelector(`.status`).innerText === '有环') {
+  showRingBtn.classList.add('can');
+  let isOn = false;
+  showRingBtn.addEventListener('click', () => {
+    isOn = !isOn;
+    showRingBtn.innerHTML = isOn ? '取消展示' : '点击展示';
+  })
 }

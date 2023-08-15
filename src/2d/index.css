@@ -1,10 +1,30 @@
+.status {
+  position: relative;
+  top: 2vh;
+  left: 4.5vw;
+  display: inline-block;
+  height: 100%;
+  line-height: 40px;
+  color: #606266;
+}
+
+.can {
+  background-color: #409eff;
+  color: #fff;
+  cursor: pointer;
+}
+
+#backBtn {
+  width: 150px;
+}
+
 #svg_div {
   position: relative;
-  width: 90vw;
-  height: 90vh;
-  border: 1px solid #c0c4cc;
-  position: relative;
   left: 5vw;
+  top: 3vh;
+  width: 90vw;
+  height: 85vh;
+  border: 1px solid #c0c4cc;
   overflow: hidden;
 }
 

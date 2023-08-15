@@ -14,22 +14,52 @@
 
 button {
   position: relative;
-  top: 1vh;
+  top: 2vh;
   left: 5vw;
   display: inline-block;
-  margin-bottom: 25px;
+  margin-bottom: 10px;
   padding-left: 20px;
   padding-right: 20px;
   height: 40px;
-  border: 1px solid #666;
+  border: 1px solid #dcdfe6;
+  background-color: #fff;
+  color: #606266;
   border-radius: 5px;
   cursor: pointer;
 }
 
-button:not(:first-child){
-  margin-left: 2vw;
-}
-
 .dark{
   background: rgba(0,0,0,0.5);
+}
+
+.line {
+  position: relative;
+  top: 2vh;
+  left: 5vw;
+  display: inline-block;
+  height: 40px;
+  width: 1px;
+  background-color: #8d8d8d;
+  margin: 0 1vw;
+  vertical-align: middle;
+}
+
+#dependencies,
+#devDependencies {
+  border: 1px solid #dcdfe6;
+  background-color: #f4f4f5;
+  color: #909399;
+}
+
+#ThreeD,
+#mode,
+#backRootBtn,
+#backBtn,
+.ring {
+  background-color: #409eff;
+  color: #fff;
+}
+
+button:hover {
+  background-color: #8bc3fd !important;
 }
