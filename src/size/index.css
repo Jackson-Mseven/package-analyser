@@ -1,8 +1,9 @@
-#back {
+/* #back {
   transform: translateY(40px);
   padding: 20px 40px;
   font-size: 26px;
-}
+  cursor: pointer;
+} */
 
 #pie {
   position: absolute;
