@@ -617,7 +617,7 @@ const show = (res) => {
 				li.addEventListener('dblclick', (e) => {
 					const clickedNodeValue =
 						e.target.dataset.nodeValue || e.target.textContent;
-					let item = clickedNodeValue.replace('-', ':');
+					let item = clickedNodeValue.replace(' - ', ' : ');
 					if (RefFlag) {
 						dependHash.nodes.some((node) => {
 							if (node.id == item) updatePosition(node.index);

@@ -1,6 +1,6 @@
 const getData = (flag) => {
 	// 渲染数据
-	const render = (data) => {
+	const render = (data, tag) => {
 		//#region
 		!(function (e) {
 			function t(t) {
@@ -329,9 +329,21 @@ const getData = (flag) => {
 			},
 		]);
 		//#endregion
+		let canvasList = document.querySelectorAll('canvas');
+
+		if (tag == 1) {
+			canvasList.forEach((canvas) => {
+				canvas.setAttribute('id', 'deCanvas');
+			});
+		} else if (tag == 2) {
+			canvasList.forEach((canvas) => {
+				if (canvas.id !== 'deCanvas') canvas.setAttribute('id', 'devCanvas');
+			});
+		}
 	};
-	if (flag == 1) render(JSON.parse(sessionStorage.getItem('dependHash')));
-	else if (flag == 2) render(JSON.parse(sessionStorage.getItem('devPendHash')));
+	if (flag == 1) render(JSON.parse(sessionStorage.getItem('dependHash')), 1);
+	else if (flag == 2)
+		render(JSON.parse(sessionStorage.getItem('devPendHash')), 2);
 
 	if (!localStorage.getItem('mode')) localStorage.setItem('mode', 'day');
 	else changedMode(false);
@@ -339,7 +351,6 @@ const getData = (flag) => {
 
 const mode = document.querySelector('#mode');
 const changedMode = (init = true) => {
-	console.log(init, localStorage.getItem('mode'));
 	let body = document.body;
 	if (localStorage.getItem('mode') == 'day') mode.innerHTML = `夜间模式`;
 	else if (localStorage.getItem('mode') == 'dark') mode.innerHTML = `白天模式`;
@@ -359,7 +370,7 @@ getData(1);
 
 const dependencies = document.querySelector('#dependencies');
 const devDependencies = document.querySelector('#devDependencies');
-let canvas;
+
 let flag = 1;
 
 const toggleMode = (el) => {
@@ -374,24 +385,39 @@ toggleMode(dependencies);
 
 dependencies.addEventListener('click', () => {
 	if (flag == 2) {
-		// 找到旧的Canvas元素
-		canvas = document.querySelector('canvas');
-		// 如果找到了旧的Canvas元素，则从DOM中删除
-		if (canvas) canvas.remove();
-		flag = 1;
-		getData(flag);
+		// 找到Canvas元素
+		let deCanvasElements = document.querySelectorAll('#deCanvas');
+		let devCanvasElements = document.querySelectorAll('#devCanvas');
+		if (deCanvasElements && devCanvasElements) {
+			deCanvasElements.forEach((canvas) => {
+				canvas.style.display = 'block';
+			});
+			devCanvasElements.forEach((canvas) => {
+				canvas.style.display = 'none';
+			});
+		}
 		toggleMode(dependencies);
+		flag = 1;
 	}
 });
 
 devDependencies.addEventListener('click', () => {
 	if (flag == 1) {
-		// 找到旧的Canvas元素
-		canvas = document.querySelector('canvas');
-		// 如果找到了旧的Canvas元素，则从DOM中删除
-		if (canvas) canvas.remove();
-		flag = 2;
-		getData(flag);
+		// 找到Canvas元素
+		let deCanvasElements = document.querySelectorAll('#deCanvas');
+		let devCanvasElements = document.querySelectorAll('#devCanvas');
+		deCanvasElements.forEach((canvas) => {
+			canvas.style.display = 'none';
+		});
+		if (devCanvasElements.length) {
+			devCanvasElements.forEach((canvas) => {
+				canvas.style.display = 'block';
+			});
+			flag = 2;
+		} else {
+			flag = 2;
+			getData(flag);
+		}
 		toggleMode(devDependencies);
 	}
 });
