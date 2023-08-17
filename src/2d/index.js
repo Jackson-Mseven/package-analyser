@@ -131,12 +131,12 @@ const show = (res) => {
 	//#endregion
 
 	let updatePosition;
+	let cachedX = null; // 存储普通节点移动距离
+	let cachedY = null;
 	const init = (flag, data) => {
 		// true: 折线 ;false: 曲线
 		let cachedRootX = null;
 		let cachedRootY = null; // 存储根节点移动距离
-		let cachedX = null; // 存储普通节点移动距离
-		let cachedY = null;
 		let x = null;
 		let y = null;
 		let k = null;
@@ -164,7 +164,7 @@ const show = (res) => {
 				.select('path')
 				.attr('d', `M ${Grid * k} 0 L 0 0 0 ${Grid * k}`);
 		};
-		d3.select('SVG').call(d3.zoom().scaleExtent([0.3, 1.5]).on('zoom', zoomed));
+		d3.select('SVG').call(d3.zoom().scaleExtent([0.1, 1.5]).on('zoom', zoomed));
 		// 创建图形容器
 		d3.select('#SVG')
 			.append('g')
@@ -228,20 +228,20 @@ const show = (res) => {
 				.force(
 					'link',
 					d3.forceLink(data.links).id((d) => d.id)
-					// .distance(100)
+					.distance(100)
 				)
-				.force('charge', d3.forceManyBody().strength(-80)) // 创建斥力
-				.force('center', d3.forceCenter(0, (100 * data.nodes.length) / 3)); // 设置中心点
+				.force('charge', d3.forceManyBody().strength(-50)) // 创建斥力
+				.force('center', d3.forceCenter(0, (10 * data.nodes.length) / 3)); // 设置中心点
 		} else if (!flag) {
 			simulation = d3
 				.forceSimulation(data.nodes)
 				.force(
 					'link',
 					d3.forceLink(data.links).id((d) => d.id)
-					// .distance(150)
+					.distance(150)
 				)
-				.force('charge', d3.forceManyBody().strength(-80)) // 创建斥力
-				.force('center', d3.forceCenter(0, (70 * data.nodes.length) / 3)); // 设置中心点
+				.force('charge', d3.forceManyBody().strength(-50)) // 创建斥力
+				.force('center', d3.forceCenter(0, (60 * data.nodes.length) / 3)); // 设置中心点
 		}
 		// 节点拖拽行为
 		const dragstarted = (d) => {
@@ -379,11 +379,11 @@ const show = (res) => {
 		if (flag) {
 			verticalForce = d3
 				.forceY()
-				.y((d) => (d.id == data.nodes[0].id ? -100 * data.nodes.length : d.y));
+				.y((d) => (d.id == data.nodes[0].id ? -40 * data.nodes.length : d.y));
 		} else if (!flag) {
 			verticalForce = d3
 				.forceY()
-				.y((d) => (d.id == data.nodes[0].id ? -80 * data.nodes.length : d.y));
+				.y((d) => (d.id == data.nodes[0].id ? -40 * data.nodes.length : d.y));
 		}
 
 		simulation
@@ -448,7 +448,7 @@ const show = (res) => {
 
 					d3.select('#graph').attr(
 						'transform',
-						`translate(${-(cachedX ? cachedX + x : x) / 1.5}, ${-(cachedY + y
+						`translate(${-(cachedX ? cachedX + x : x) / 2}, ${-(cachedY + y
 							? cachedY
 							: y)})`
 					);
@@ -459,7 +459,7 @@ const show = (res) => {
 						.transform(
 							d3.select('#SVG'),
 							d3.zoomIdentity.translate(
-								-(cachedX ? cachedX + x : x) / 1.5,
+								-(cachedX ? cachedX + x : x) / 2,
 								-(cachedY + y ? cachedY : y)
 							)
 						); // 重置内部状态
@@ -619,11 +619,17 @@ const show = (res) => {
 						e.target.dataset.nodeValue || e.target.textContent;
 					let item = clickedNodeValue.replace(' - ', ' : ');
 					if (RefFlag) {
-						dependHash.nodes.some((node) => {
-							if (node.id == item) updatePosition(node.index);
+						dependHash.nodes.forEach((node) => {
+							if (node.id == item) {
+								cachedX = node.x;
+								cachedY = node.y;
+								updatePosition(node.index);
+							}
 						});
 					} else {
-						devPendHash.nodes.some((node) => {
+						devPendHash.nodes.forEach((node) => {
+							cachedX = node.x;
+							cachedY = node.y;
 							if (node.id == item) updatePosition(node.index);
 						});
 					}
