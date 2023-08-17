@@ -48,6 +48,11 @@
   stroke-width: 1px;
 }
 
+.root:hover,
+.node:hover {
+  fill: rgba(0, 0, 255, 0.55);
+}
+
 .root {
   fill: rgba(33, 33, 33, 0.9);
   stroke: white;
