@@ -147,3 +147,7 @@ input[type="search"]{
   font-size: 0.7em;
   text-align: center;
 }
+
+#aside li:hover{
+  background: rgba(255,255,255,0.7);
+}
