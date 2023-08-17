@@ -11,7 +11,7 @@ module.exports = function (data: Data) {
   const app: { use: Function; get: Function; listen: Function } = express();
 
   // 配置 express 服务器的默认地址
-  app.use(express.static(process.cwd().replace(/\\/g, '/') + '/src'));
+  app.use(express.static(__dirname.slice(0, __dirname.indexOf('dist')) + '\\src'));
 
   app.get('/getData', (req: object, res: { send: Function }) => {
     res.send(data);
