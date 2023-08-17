@@ -227,8 +227,10 @@ const show = (res) => {
 				.forceSimulation(data.nodes)
 				.force(
 					'link',
-					d3.forceLink(data.links).id((d) => d.id)
-					.distance(100)
+					d3
+						.forceLink(data.links)
+						.id((d) => d.id)
+						.distance(100)
 				)
 				.force('charge', d3.forceManyBody().strength(-50)) // 创建斥力
 				.force('center', d3.forceCenter(0, (10 * data.nodes.length) / 3)); // 设置中心点
@@ -237,8 +239,10 @@ const show = (res) => {
 				.forceSimulation(data.nodes)
 				.force(
 					'link',
-					d3.forceLink(data.links).id((d) => d.id)
-					.distance(150)
+					d3
+						.forceLink(data.links)
+						.id((d) => d.id)
+						.distance(150)
 				)
 				.force('charge', d3.forceManyBody().strength(-50)) // 创建斥力
 				.force('center', d3.forceCenter(0, (60 * data.nodes.length) / 3)); // 设置中心点
@@ -573,7 +577,10 @@ const show = (res) => {
 
 	const asideInit = () => {
 		const selectLis = document.querySelectorAll('#aside .content li');
+		const searchInput = document.querySelector('#search-input');
 		let searchText = '';
+		searchInput.value = ''; // 清空上次输入
+
 		// 输入防抖
 		const debounce = (callback, delay) => {
 			let timerId;
@@ -582,6 +589,14 @@ const show = (res) => {
 				timerId = setTimeout(callback, delay);
 			};
 		};
+
+		searchInput.addEventListener(
+			'input',
+			debounce(() => {
+				searchText = searchInput.value;
+				search();
+			}, 300)
+		);
 
 		// 搜索
 		const search = () => {
@@ -599,15 +614,6 @@ const show = (res) => {
 				}
 			});
 		};
-
-		const searchInput = document.querySelector('#search-input');
-		searchInput.addEventListener(
-			'input',
-			debounce(() => {
-				searchText = searchInput.value;
-				search();
-			}, 300)
-		);
 
 		selectLis.forEach((li) => {
 			const ulElement = li.querySelector('ul');
