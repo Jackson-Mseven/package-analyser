@@ -10,6 +10,7 @@ async function getData() {
 getData();
 
 const show = (res) => {
+	console.log(res);
 	const smallGrid = 50;
 	const Grid = 500;
 	let isPolyline = false; // true: 折线 ;false: 曲线
@@ -62,6 +63,8 @@ const show = (res) => {
 	let devPendHash;
 	let dependToVersionsObj;
 	let devDependToVersionsObj;
+	let dependencyHoop;
+	let devDependencyHoop;
 
 	dependHash = convertJsonToArrays(json.dependHash);
 	devPendHash = convertJsonToArrays(json.devPendHash);
@@ -77,12 +80,15 @@ const show = (res) => {
 		'devDependToVersionsObj',
 		JSON.stringify(devDependToVersionsObj)
 	);
-	sessionStorage.setItem('dependencyHoop', JSON.stringify(res.dependencyHoop));
+	dependencyHoop = convertJsonToArrays(json.dependencyHoop[1]);
+	devDependencyHoop = convertJsonToArrays(json.devDependencyHoop[1]);
+
+	sessionStorage.setItem('dependencyHoop', JSON.stringify(dependencyHoop));
 	sessionStorage.setItem(
-		'devependencyHoop',
-		JSON.stringify(res.devependencyHoop)
+		'devDependencyHoop',
+		JSON.stringify(devDependencyHoop)
 	);
-	sessionStorage.setItem('dependentSizes', JSON.stringify(res.dependentSizes));
+	sessionStorage.setItem('dependentSizes', JSON.stringify(json.dependentSizes));
 
 	//#region
 	// 添加svg元素
@@ -378,7 +384,7 @@ const show = (res) => {
 
 		const horizontalForce = d3
 			.forceX()
-			.x((d) => (d.id === data.nodes[0].id ? 0 : d.x));
+			.x((d) => (d.id == data.nodes[0].id ? 0 : d.x));
 		let verticalForce;
 		if (flag) {
 			verticalForce = d3
@@ -512,12 +518,10 @@ const show = (res) => {
 		const highlightLinks = () => {
 			link.attr('class', (d) => {
 				// 设置与悬停节点相关的连线样式
-				if (d.source.id === hoveredNodeId) return 'link-hover';
+				if (d.source.id == hoveredNodeId) return 'link-hover';
 				else return 'link';
 			});
 		};
-
-		// 折叠节点
 	};
 
 	// 切换格式
@@ -530,7 +534,18 @@ const show = (res) => {
 			const svg = d3.select('#graph');
 			svg.remove();
 			isPolyline = true;
-			init(isPolyline, inputData);
+			if (showRingBtn.innerHTML == '取消展示') {
+				if (inputData == dependHash)
+					init(
+						isPolyline,
+						JSON.parse(sessionStorage.getItem('dependencyHoop'))
+					);
+				else if (inputData == devPendHash)
+					init(
+						isPolyline,
+						JSON.parse(sessionStorage.getItem('devDependencyHoop'))
+					);
+			} else init(isPolyline, inputData);
 			toggleMode(polyline);
 		}
 	});
@@ -540,10 +555,71 @@ const show = (res) => {
 			const svg = d3.select('#graph');
 			svg.remove();
 			isPolyline = false;
-			init(isPolyline, inputData);
+			if (showRingBtn.innerHTML == '取消展示') {
+				if (inputData == dependHash)
+					init(
+						isPolyline,
+						JSON.parse(sessionStorage.getItem('dependencyHoop'))
+					);
+				else if (inputData == devPendHash)
+					init(
+						isPolyline,
+						JSON.parse(sessionStorage.getItem('devDependencyHoop'))
+					);
+			} else init(isPolyline, inputData);
 			toggleMode(curve);
 		}
 	});
+
+	// 展示环状数据
+	const showRingBtn = document.querySelector(`.ring`);
+	let isOn = false;
+	let ringData;
+	showRingBtn.addEventListener('click', () => {
+		showRingBtn.classList.add('can');
+		isOn = !isOn;
+		if (isOn) {
+			showRingBtn.innerHTML = '取消展示';
+			const svg = d3.select('#graph');
+			svg.remove();
+			if (inputData == dependHash) {
+				ringData = JSON.parse(sessionStorage.getItem('dependencyHoop'));
+				showDepend(json.dependencyHoop[1]);
+			} else if (inputData == devPendHash) {
+				ringData = JSON.parse(sessionStorage.getItem('devDependencyHoop'));
+				showDepend(json.devDependencyHoop[1]);
+			}
+			init(isPolyline, ringData);
+			flag = 3;
+			asideInit();
+		} else {
+			showRingBtn.innerHTML = '点击展示';
+			const svg = d3.select('#graph');
+			svg.remove();
+			init(isPolyline, inputData);
+			if (inputData == dependHash) {
+				flag = 3;
+				showDepend(dependToVersionsObj);
+			} else if (inputData == devPendHash) {
+				flag = 4;
+				showDepend(devDependToVersionsObj);
+			}
+			asideInit();
+		}
+	});
+
+	const visibleRingBtn = (data) => {
+		if (data) {
+			document.querySelector(`.status`).innerText = '有环';
+			showRingBtn.style.display = 'inline-block';
+		} else {
+			document.querySelector(`.status`).innerText = '无环';
+			showRingBtn.style.display = 'none';
+		}
+	};
+	visibleRingBtn(json.dependencyHoop[0]);
+
+	// 切换环境
 	const dependencies = document.querySelector('#dependencies');
 	const devDependencies = document.querySelector('#devDependencies');
 	dependencies.addEventListener('click', () => {
@@ -554,8 +630,11 @@ const show = (res) => {
 			init(isPolyline, inputData);
 			showDepend(dependToVersionsObj);
 			toggleMode(dependencies);
-			RefFlag = true;
+			RefFlag = 1;
 			asideInit();
+			visibleRingBtn(json.dependencyHoop[0]);
+			isOn = false;
+			showRingBtn.innerHTML = '点击展示';
 		}
 	});
 
@@ -567,8 +646,11 @@ const show = (res) => {
 			init(isPolyline, inputData);
 			showDepend(devDependToVersionsObj);
 			toggleMode(devDependencies);
-			RefFlag = false;
+			RefFlag = 2;
 			asideInit();
+			visibleRingBtn(json.devDependencyHoop[0]);
+			isOn = false;
+			showRingBtn.innerHTML = '点击展示';
 		}
 	});
 	toggleMode(dependencies);
@@ -624,7 +706,7 @@ const show = (res) => {
 					const clickedNodeValue =
 						e.target.dataset.nodeValue || e.target.textContent;
 					let item = clickedNodeValue.replace(' - ', ' : ');
-					if (RefFlag) {
+					if (RefFlag == 1) {
 						dependHash.nodes.forEach((node) => {
 							if (node.id == item) {
 								cachedX = node.x;
@@ -632,8 +714,24 @@ const show = (res) => {
 								updatePosition(node.index);
 							}
 						});
-					} else {
+					} else if (RefFlag == 2) {
 						devPendHash.nodes.forEach((node) => {
+							cachedX = node.x;
+							cachedY = node.y;
+							if (node.id == item) updatePosition(node.index);
+						});
+					} else if (RefFlag == 3) {
+						JSON.parse(sessionStorage.getItem('dependencyHoop')).nodes.forEach(
+							(node) => {
+								cachedX = node.x;
+								cachedY = node.y;
+								if (node.id == item) updatePosition(node.index);
+							}
+						);
+					} else if (RefFlag == 4) {
+						JSON.parse(
+							sessionStorage.getItem('devDependencyHoop')
+						).nodes.forEach((node) => {
 							cachedX = node.x;
 							cachedY = node.y;
 							if (node.id == item) updatePosition(node.index);
@@ -649,7 +747,7 @@ const show = (res) => {
 	else changedMode(false);
 };
 
-let RefFlag = true; // 用于判断侧边栏处于那个依赖
+let RefFlag = 1; // 用于判断侧边栏处于那个依赖  1:生产  2:开发  3:展示环
 const toggleMode = (el) => {
 	const dependencies = document.querySelector(`#dependencies`);
 	const devDependencies = document.querySelector(`#devDependencies`);
@@ -680,11 +778,13 @@ arrow.addEventListener('click', () => {
 	arrow.classList.toggle('arrow-open');
 });
 
+// 切换3D依赖关系图
 const ThreeD = document.querySelector('#ThreeD');
 ThreeD.addEventListener('click', () => {
 	location.href = '../3d/index.html';
 });
 
+// 切换模式
 const changedMode = (init = true) => {
 	let body = document.body;
 	let smallGrid = document.querySelector('defs #smallGrid path');
@@ -704,7 +804,6 @@ const changedMode = (init = true) => {
 	else if (!init && localStorage.getItem('mode') == 'dark')
 		body.classList.add('dark'); //初始化时保存的是夜间模式更新背景色
 };
-
 const mode = document.querySelector('#mode');
 mode.addEventListener('click', () => {
 	if (localStorage.getItem('mode') == 'dark')
@@ -725,7 +824,7 @@ const showDepend = (data) => {
 		const li = document.createElement('li');
 		let version = data[i];
 		if (Array.isArray(version)) {
-			if (version.length === 1) {
+			if (version.length == 1) {
 				li.textContent = `${i} - ${version[0]}`;
 				li.dataset.nodeValue = `${i} - ${version[0]}`;
 				li.title = `${i} - ${version[0]}`; // 添加 title 属性
@@ -751,16 +850,6 @@ const showDepend = (data) => {
 	}
 	content.appendChild(ul);
 };
-
-const showRingBtn = document.querySelector(`.ring`);
-if (document.querySelector(`.status`).innerText === '有环') {
-	showRingBtn.classList.add('can');
-	let isOn = false;
-	showRingBtn.addEventListener('click', () => {
-		isOn = !isOn;
-		showRingBtn.innerHTML = isOn ? '取消展示' : '点击展示';
-	});
-}
 
 const size = document.querySelector('#size');
 size.addEventListener('click', () => {

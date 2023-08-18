@@ -23,17 +23,8 @@ package-analysis 是一个简单易用的分析依赖以及依赖体积的工具
 
 ## 依赖图使用
 ### 2D
-<style>
-.center
-{
-  width: auto;
-  display: table;
-  margin-left: auto;
-  margin-right: auto;
-}
-</style>
 
-<div class="center">
+<div style="width: auto;display: table;margin-left: auto;margin-right: auto;">
 
 |  操作   |  效果  |
 |  :----:  | :----:  |
@@ -48,19 +39,7 @@ package-analysis 是一个简单易用的分析依赖以及依赖体积的工具
 
 ### 3D
 
-<style>
-.center
-{
-  width: auto;
-  display: table;
-  margin-left: auto;
-  margin-right: auto;
-}
-</style>
-
-<p align="center"><font face="黑体" size=2.>表1 示例表格</font></p>
-
-<div class="center">
+<div style="width: auto;display: table;margin-left: auto;margin-right: auto;">
 
 |  操作   |  效果  |
 |  :----:  | :----:  |
