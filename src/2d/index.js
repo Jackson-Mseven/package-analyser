@@ -33,7 +33,7 @@ const show = (res) => {
 				links.push({
 					source: sourceNodeId,
 					target: targetNodeId,
-					value: Math.random(),
+					value: 1,
 				});
 			}
 			if (typeof value == 'object') {
@@ -49,7 +49,7 @@ const show = (res) => {
 						links.push({
 							source: nodeId,
 							target: targetNodeId,
-							value: Math.random(),
+							value: 1,
 						});
 					} else processNode(childId, childValue, nodeId);
 				}
