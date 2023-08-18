@@ -35,6 +35,9 @@ function showPie(data) {
 		legend: {
 			top: '5%',
 			left: 'center',
+			textStyle: {
+				color: '',
+			},
 		},
 		series: [
 			{
@@ -44,7 +47,7 @@ function showPie(data) {
 				avoidLabelOverlap: false,
 				itemStyle: {
 					borderRadius: 10,
-					borderColor: '#fff',
+					borderColor: '',
 					borderWidth: 2,
 				},
 				label: {
@@ -56,6 +59,7 @@ function showPie(data) {
 						show: true,
 						fontSize: 30,
 						fontWeight: 'bold',
+						color: '',
 					},
 				},
 				labelLine: {
@@ -65,6 +69,16 @@ function showPie(data) {
 			},
 		],
 	};
+
+	if (localStorage.getItem('mode') == 'day') {
+		option.legend.textStyle.color = 'black';
+		option.series[0].itemStyle.borderColor = 'black';
+		option.series[0].emphasis.label.color = 'black';
+	} else if (localStorage.getItem('mode') == 'dark') {
+		option.legend.textStyle.color = 'white';
+		option.series[0].itemStyle.borderColor = 'white';
+		option.series[0].emphasis.label.color = 'white';
+	}
 
 	pie.setOption(option); // 渲染图表
 }
@@ -110,11 +124,17 @@ function showBar(xData, yData) {
 				axisTick: {
 					alignWithLabel: true,
 				},
+				axisLabel: {
+					color: '',
+				},
 			},
 		],
 		xAxis: [
 			{
 				type: 'value',
+				axisLabel: {
+					color: '',
+				},
 			},
 		],
 		series: [
@@ -126,6 +146,14 @@ function showBar(xData, yData) {
 			},
 		],
 	};
+
+	if (localStorage.getItem('mode') == 'day') {
+		option.yAxis[0].axisLabel.color = 'black';
+		option.xAxis[0].axisLabel.color = 'black';
+	} else if (localStorage.getItem('mode') == 'dark') {
+		option.yAxis[0].axisLabel.color = 'white';
+		option.xAxis[0].axisLabel.color = 'white';
+	}
 
 	bar.setOption(option); // 渲染图表
 }
@@ -144,6 +172,8 @@ const changedMode = (init = true) => {
 	if (init) body.classList.toggle('dark');
 	else if (!init && localStorage.getItem('mode') == 'dark')
 		body.classList.add('dark'); //初始化时保存的是夜间模式更新背景色
+	showBar(xData, yData);
+	showPie(data);
 };
 
 mode.addEventListener('click', () => {

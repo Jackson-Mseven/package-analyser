@@ -47,7 +47,7 @@ const changedMode = (init = true) => {
 		mode.innerHTML = `白天模式`;
 		graph
 			.backgroundColor('#7f7f7f') //背景色
-			.linkOpacity(1) // 链接透明度
+			.linkOpacity(0.4) // 链接透明度
 			.nodeThreeObject((node) => {
 				const sprite = new SpriteText(node.id);
 				sprite.color = 'white';
