@@ -27,6 +27,8 @@ npm i package-analyzer -g
 
 ## 使用
 
+### 后台使用
+
 ```bash
 /**
  * @param { number } depth：依赖的深度（限制为 整数 以及 Infinity）
@@ -35,7 +37,7 @@ npm i package-analyzer -g
 analyze-cli analyze [depth] [jsonFile]
 ```
 
-## 依赖图使用
+### 依赖图使用
 ### 2D
 
 |  操作   |  效果  |
@@ -54,3 +56,7 @@ analyze-cli analyze [depth] [jsonFile]
 | 左键/右键节点  | 拖动节点 |
 | 右键画布  | 平移视角 |
 | 滑动滚轮  | 缩放视角 |
+
+## 注意
+
+如果你手动将 localStorage 中的数据删除后不能正常
