@@ -12,6 +12,7 @@ export default function (data: Record<string, Record<string, string>>) {
 
   const dataMap: Map<string, object> = jsonToMap(data); // Map 类型的数据
 
+
   /**
    * 遍历每一个包，将其依赖由对象转换为数组
    * @param {map} dataMap：数据
@@ -83,7 +84,7 @@ export default function (data: Record<string, Record<string, string>>) {
     directedGraph: Map<string, Array<string>>,
     indegree: Map<string, number>,
     noVisited: Set<string>
-  ): [boolean, Map<string, string[]>] {
+  ) {
     // 获取入口节点
     const iterator: IterableIterator<string> = directedGraph.keys(); // 数据 Map 的迭代器
     const inlet: string = iterator.next().value; // 入口节点（唯一入度为0的节点）
@@ -109,7 +110,19 @@ export default function (data: Record<string, Record<string, string>>) {
     for (const curPackage of Array.from(noVisited.values())) {
       hoop.set(curPackage, directedGraph.get(curPackage));
     }
-    return [flag, Object.fromEntries(hoop)];
+
+    const hoopVersion = Array.from(hoop.keys()).reduce((total: Map<string, Array<string>>, item) => {
+      const name: string = item.split(' : ')[0]
+      const version: string = item.split(' : ')[1]
+      if (total.has(name)) { // 存在多个版本
+        const versions = total.get(name)!
+        return total.set(name, [...versions, version])
+      } else { // 第一个版本
+        return total.set(name, [version])
+      }
+    }, new Map())
+
+    return [flag, Object.fromEntries(hoop), Object.fromEntries(hoopVersion)];
   }
 
   return findHoopAndShow(directedGraph, indegree, noVisited); // 环信息

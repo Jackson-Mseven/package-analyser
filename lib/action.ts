@@ -11,9 +11,6 @@ const fileS = require('fs')
 
 /**
  * 定义命令执行的回调函数
- */
-
-/**
  * @param {string} packageName：包名
  * @param {string} version：版本号
  * @param {string} packageManagementTools：包管理工具
@@ -27,8 +24,8 @@ module.exports = function (
   dependencies: object,
   devDependencies: object
 ): Function {
-  // 命令行的执行逻辑代码
   /**
+   * 命令行的执行逻辑代码
    * @param {string} depth：递归的深度
    * @param {string} jsonFile：导出的 JSON 文件路径
    */
@@ -37,13 +34,9 @@ module.exports = function (
      * 获取依赖信息
      * @returns { object } data：依赖信息
      */
-    async function getData() {
-      const dependHash = await getDependHash('Infinity', packageManagementTools);
-      const devPendHash = await getDependHash(
-        'Infinity',
-        packageManagementTools,
-        field.devDependencies
-      );
+    async function getData(depth: string = "Infinity") {
+      const dependHash = await getDependHash(depth, packageManagementTools);
+      const devPendHash = await getDependHash(depth, packageManagementTools, field.devDependencies);
       const dependToVersionsObj = dependHash_To_nameVersionsObj(dependHash);
       const devDependToVersionsObj = dependHash_To_nameVersionsObj(devPendHash);
       const dependencyHoop = findHoopAndShow(dependHash);
@@ -64,47 +57,44 @@ module.exports = function (
       };
     }
 
-    /**
-     * 写入 time.txt、dependencyInformation.json 文件
-     * @param { string } time：修改时间
-     * @param { object } data：依赖信息
-     */
-    const writeFile = (time: string, data: object) => {
-      fileS.writeFile('./time.txt', time, (err: Error) => { // 初始化 time.txt
-        if (err) throw err // 写入 time.txt 失败
-      })
-      fileS.writeFile('./dependencyInformation.json', JSON.stringify(data, null, 2), (err: Error) => {
-        if (err) throw err // 写入 dependencyInformation.json 失败
-      })
-    }
-
     const p: Promise<string | object> = new Promise((resolve: Function, reject: Function) => {
-      fileS.stat('./package.json', (err: Error, state: { mtime: number }) => { // 读取 package.json 文件的状态
-        if (err) reject(err)
-        const time = state.mtime.toString();
-        fileS.readFile('./time.txt', async (err: Error, data: string) => { // 读取 time.txt
-          if (!err && data.toString() === time) { // package.json 没有改变
-            resolve(depth || 'Infinity')
-          } else { // 初始化 或 package.json 改变了
-            await getData().then(val => {
-              writeFile(time, val);
-              resolve(val);
-            })
-          }
+      if (!jsonFile) { // 网页显示
+        fileS.stat('./package.json', (err: Error, state: { mtime: number }) => { // 读取 package.json 文件的状态
+          if (err) reject(err)
+          const time = state.mtime.toString();
+          fileS.readFile('./time.txt', async (err: Error, data: string) => { // 读取 time.txt
+            if (!err && data.toString() === time) { // package.json 没有改变
+              resolve(depth || 'Infinity')
+            } else { // 初始化 或 package.json 改变了
+              await getData().then(val => {
+                fileS.writeFile('./time.txt', time, (err: Error) => {
+                  if (err) throw err
+                })
+                resolve(val);
+              }).catch(err => {
+                reject(err);
+              })
+            }
+          })
         })
-      })
+      } else { // 输出 JSON 文件
+        getData(depth).then(val => {
+          resolve(val);
+        }).catch(err => {
+          reject(err);
+        })
+      }
     })
 
     p.then((val: object | string) => {
       if (!jsonFile) {
-        console.log(val);
         const server: Function = require('./server');
         server(val);
       } else {
         fs.writeFile(jsonFile, JSON.stringify(val as object, null, 2));
       }
-    }).catch((err: Error) => {
-      throw err
+    }).catch(err => {
+      throw err;
     })
   };
 };
