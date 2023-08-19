@@ -539,7 +539,7 @@ const show = (res) => {
 				d3.select('#SVG g').node().style = 'display:block';
 			},
 			Math.min(
-				Math.max(data.nodes.length * 2, 400) + data.links.length * 5,
+				Math.max(data.nodes.length * 2, 800) + data.links.length * 5,
 				1200
 			)
 		);
@@ -622,11 +622,11 @@ const show = (res) => {
 			if (inputData == dependHash) {
 				ringData = dependencyHoop;
 				RefFlag = 3;
-				showDepend(dependencyHoopObj[1]);
+				showDepend(dependencyHoopObj[2]);
 			} else if (inputData == devPendHash) {
 				ringData = devDependencyHoop;
 				RefFlag = 4;
-				showDepend(devDependencyHoopObj[1]);
+				showDepend(devDependencyHoopObj[2]);
 			}
 			init(isPolyline, ringData);
 			flag = 3;
@@ -773,7 +773,6 @@ const show = (res) => {
 							if (node.id == item) updatePosition(node.index);
 						});
 					} else if (RefFlag == 4) {
-						console.log(devDependencyHoop);
 						devDependencyHoop.nodes.forEach((node) => {
 							cachedX = node.x;
 							cachedY = node.y;
