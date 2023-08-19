@@ -530,6 +530,7 @@ const show = (res) => {
       updatePosition(data.nodes[0].index)
     );
 
+<<<<<<< HEAD
     setTimeout(
       () => {
         backBtn.click();
@@ -540,6 +541,19 @@ const show = (res) => {
         1200
       )
     );
+=======
+		console.log(data.nodes.length * 2 + data.links.length * 4);
+		setTimeout(
+			() => {
+				backBtn.click();
+				d3.select('#SVG g').node().style = 'display:block';
+			},
+			Math.min(
+				Math.max(data.nodes.length * 2, 800) + data.links.length * 5,
+				1200
+			)
+		);
+>>>>>>> 95ce1652a37c11a658564ff679e64f96b7cfe836
 
     // 视口大小发生变化时更新元素位置
     const updateViewPort = () => {
@@ -605,6 +619,7 @@ const show = (res) => {
     }
   });
 
+<<<<<<< HEAD
   // 展示环状数据
   const showRingBtn = document.querySelector(`.ring`);
   let isOn = false;
@@ -645,6 +660,48 @@ const show = (res) => {
       asideInit();
     }
   });
+=======
+	// 展示环状数据
+	const showRingBtn = document.querySelector(`.ring`);
+	let isOn = false;
+	let ringData;
+	showRingBtn.addEventListener('click', () => {
+		showRingBtn.classList.add('can');
+		isOn = !isOn;
+		if (isOn) {
+			showRingBtn.innerHTML = '取消展示';
+			const svg = d3.select('#graph');
+			svg.remove();
+			if (inputData == dependHash) {
+				ringData = dependencyHoop;
+				RefFlag = 3;
+				showDepend(dependencyHoopObj[2]);
+			} else if (inputData == devPendHash) {
+				ringData = devDependencyHoop;
+				RefFlag = 4;
+				showDepend(devDependencyHoopObj[2]);
+			}
+			init(isPolyline, ringData);
+			flag = 3;
+			asideInit();
+		} else {
+			showRingBtn.innerHTML = '点击展示';
+			const svg = d3.select('#graph');
+			svg.remove();
+			init(isPolyline, inputData);
+			if (inputData == dependHash) {
+				flag = 3;
+				RefFlag = 1;
+				showDepend(dependToVersionsObj);
+			} else if (inputData == devPendHash) {
+				flag = 4;
+				RefFlag = 2;
+				showDepend(devDependToVersionsObj);
+			}
+			asideInit();
+		}
+	});
+>>>>>>> 95ce1652a37c11a658564ff679e64f96b7cfe836
 
   // 控制展示环按钮
   const visibleRingBtn = (data) => {
@@ -738,6 +795,7 @@ const show = (res) => {
       });
     };
 
+<<<<<<< HEAD
     // 渲染依赖项
     selectLis.forEach((li) => {
       const ulElement = li.querySelector('ul');
@@ -782,6 +840,55 @@ const show = (res) => {
     });
   };
   asideInit();
+=======
+		// 渲染依赖项
+		selectLis.forEach((li) => {
+			const ulElement = li.querySelector('ul');
+			if (ulElement) {
+				ulElement.addEventListener('click', (e) => e.stopPropagation()); // 阻止内部 ul 元素的事件冒泡和事件委托
+			} else {
+				li.addEventListener('dblclick', (e) => {
+					const clickedNodeValue =
+						e.target.dataset.nodeValue || e.target.textContent;
+					let item = clickedNodeValue.replace(' - ', ' : ');
+					console.log('flag', RefFlag);
+					if (RefFlag == 1) {
+						dependHash.nodes.forEach((node) => {
+							if (node.id == item) {
+								cachedX = node.x;
+								cachedY = node.y;
+								updatePosition(node.index);
+							}
+						});
+					} else if (RefFlag == 2) {
+						devPendHash.nodes.forEach((node) => {
+							cachedX = node.x;
+							cachedY = node.y;
+							if (node.id == item) updatePosition(node.index);
+						});
+					} else if (RefFlag == 3) {
+						dependencyHoop.nodes.forEach((node) => {
+							cachedX = node.x;
+							cachedY = node.y;
+							if (node.id == item) updatePosition(node.index);
+						});
+					} else if (RefFlag == 4) {
+						devDependencyHoop.nodes.forEach((node) => {
+							cachedX = node.x;
+							cachedY = node.y;
+							console.log(item);
+							if (node.id == item) {
+								console.log(node.index);
+								updatePosition(node.index);
+							}
+						});
+					}
+				});
+			}
+		});
+	};
+	asideInit();
+>>>>>>> 95ce1652a37c11a658564ff679e64f96b7cfe836
 
   if (!localStorage.getItem('mode')) localStorage.setItem('mode', 'day');
   else changedMode(false);

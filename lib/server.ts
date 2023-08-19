@@ -35,6 +35,10 @@ module.exports = function (data: Data) {
   };
 
   openDefaultBrowser('http://localhost:5005/2d/index.html');
+<<<<<<< HEAD
+=======
+  // openDefaultBrowser('http://localhost:5005/demo.html');
+>>>>>>> 95ce1652a37c11a658564ff679e64f96b7cfe836
 
   app.listen(5005, (err: object) => {
     if (err) {
@@ -43,5 +47,9 @@ module.exports = function (data: Data) {
     }
     console.log('服务器启动了');
     console.log('http://localhost:5005/2d/index.html');
+<<<<<<< HEAD
+=======
+    // console.log('http://localhost:5005/demo.html');
+>>>>>>> 95ce1652a37c11a658564ff679e64f96b7cfe836
   });
 };
