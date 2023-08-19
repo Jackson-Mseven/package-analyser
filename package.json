@@ -1,9 +1,15 @@
 {
-  "name": "package-analysis",
-  "version": "1.0.6",
-  "description": "Package-analysis 是一个简单易用的分析依赖以及依赖体积的工具。Starting from the package.json, we recursively traverse through all the package.json files in the node_modules directory to generate a module dependency graph.",
-  "keywords": ["npm package analysis tool","dependency graph","command-line tool","circular dependencies detection","multiple versions detection"],
-  "author": "Byte Youth Training Project 1",
+  "name": "package-analyser",
+  "version": "0.0.2",
+  "description": "package-analyzer 是一个简单易用的分析依赖以及依赖体积的命令行工具。",
+  "keywords": [
+    "package",
+    "analyze",
+    "analysis",
+    "analyzer",
+    "size"
+  ],
+  "author": "Jackson-Mseven,leviash,幻小芒,xun-zi",
   "license": "Apache-2.0",
   "main": "./dist/bin/index.js",
   "scripts": {
@@ -31,12 +37,13 @@
     "*.{js,css,md}": "prettier --write"
   },
   "bin": {
-    "analyze-cli": "./dist/bin/index.js"
+    "an-cli": "./dist/bin/index.js"
   },
   "dependencies": {
     "commander": "^11.0.0",
     "express": "^4.18.2",
     "js-yaml": "^4.1.0",
-    "remote-file-size": "^3.0.5"
+    "remote-file-size": "^3.0.5",
+    "semver": "^7.5.4"
   }
 }
