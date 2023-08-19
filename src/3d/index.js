@@ -7,19 +7,12 @@ const getData = (flag) => {
 
 		const graphData = JSON.parse(data); // 序列化
 		graph = ForceGraph3D()(document.querySelector('#graph-3d'))
-			.linkDirectionalParticles(2)
 			.graphData(graphData)
-			.linkDirectionalArrowLength(3.5) // 箭头长度
+			.linkDirectionalArrowLength(4) // 箭头长度
 			.linkDirectionalArrowRelPos(1) // 箭头位置偏移 source指向target
 			.linkDirectionalParticles('value')
 			.linkDirectionalParticleSpeed((d) => d.value * 0.005)
-			.nodeThreeObject((node) => {
-				const sprite = new SpriteText(node.id);
-				sprite.material.depthWrite = true; // make sprite background transparent
-				sprite.color = node.color;
-				sprite.textHeight = 2;
-				return sprite;
-			});
+			.linkAutoColorBy((d) => d.source);
 	};
 	if (flag == 1) render(localStorage.getItem('dependHash'));
 	else if (flag == 2) render(localStorage.getItem('devPendHash'));
