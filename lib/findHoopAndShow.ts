@@ -106,12 +106,11 @@ export default function (data: Record<string, Record<string, string>>) {
       flag = true;
     }
 
-    const hoop = new Map();
-    for (const curPackage of Array.from(noVisited.values())) {
-      hoop.set(curPackage, directedGraph.get(curPackage));
-    }
+    const hoop = Array.from(noVisited.values()).reduce((total, item) => { // 环
+      return total.set(item, dataMap.get(item))
+    }, new Map())
 
-    const hoopVersion = Array.from(hoop.keys()).reduce((total: Map<string, Array<string>>, item) => {
+    const hoopVersion = Array.from(hoop.keys()).reduce((total: Map<string, Array<string>>, item) => { // 环版本
       const name: string = item.split(' : ')[0]
       const version: string = item.split(' : ')[1]
       if (total.has(name)) { // 存在多个版本
