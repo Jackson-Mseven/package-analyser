@@ -1,4 +1,4 @@
-const dependentSizes = JSON.parse(sessionStorage.getItem('dependentSizes'));
+const dependentSizes = JSON.parse(localStorage.getItem('dependentSizes'));
 // 获取数据
 const data = workWithPieData(dependentSizes);
 showPie(data);

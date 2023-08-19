@@ -21,8 +21,8 @@ const getData = (flag) => {
 				return sprite;
 			});
 	};
-	if (flag == 1) render(sessionStorage.getItem('dependHash'));
-	else if (flag == 2) render(sessionStorage.getItem('devPendHash'));
+	if (flag == 1) render(localStorage.getItem('dependHash'));
+	else if (flag == 2) render(localStorage.getItem('devPendHash'));
 
 	if (!localStorage.getItem('mode')) localStorage.setItem('mode', 'day');
 	else changedMode(false);
@@ -34,7 +34,7 @@ const changedMode = (init = true) => {
 	if (localStorage.getItem('mode') == 'day') {
 		mode.innerHTML = `夜间模式`;
 		graph
-			.graphData(JSON.parse(sessionStorage.getItem('dependHash'))) // 加载数据
+			.graphData(JSON.parse(localStorage.getItem('dependHash'))) // 加载数据
 			.backgroundColor('white') //背景色
 			.linkOpacity(1) // 链接透明度
 			.nodeThreeObject((node) => {
@@ -89,7 +89,7 @@ dependencies.addEventListener('click', () => {
 		toggleMode(dependencies);
 		flag = 1;
 		// getData(flag);
-		graph.graphData(JSON.parse(sessionStorage.getItem('dependHash'))); // 加载数据
+		graph.graphData(JSON.parse(localStorage.getItem('dependHash'))); // 加载数据
 	}
 });
 
@@ -98,7 +98,7 @@ devDependencies.addEventListener('click', () => {
 		toggleMode(devDependencies);
 		flag = 2;
 		// getData(flag);
-		graph.graphData(JSON.parse(sessionStorage.getItem('devPendHash'))); // 加载数据
+		graph.graphData(JSON.parse(localStorage.getItem('devPendHash'))); // 加载数据
 	}
 });
 
