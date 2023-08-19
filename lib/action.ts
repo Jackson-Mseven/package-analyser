@@ -87,10 +87,10 @@ module.exports = function (
     })
 
     p.then((val: object | string) => {
-      if (!jsonFile) {
+      if (!jsonFile) { // 网页显示
         const server: Function = require('./server');
         server(val);
-      } else {
+      } else { // 输出 JSON 文件
         fs.writeFile(jsonFile, JSON.stringify(val as object, null, 2));
       }
     }).catch(err => {
