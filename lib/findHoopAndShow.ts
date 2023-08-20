@@ -11,7 +11,6 @@ export default function (data: Record<string, Record<string, string>>) {
   }
 
   const dataMap: Map<string, object> = jsonToMap(data); // Map 类型的数据
-  console.log(dataMap);
 
   /**
    * 遍历每一个包，将其依赖由对象转换为数组

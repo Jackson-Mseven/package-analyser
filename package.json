@@ -1,7 +1,7 @@
 {
   "name": "package-analyser",
   "version": "0.0.2",
-  "description": "package-analyzer 是一个简单易用的分析依赖以及依赖体积的命令行工具。",
+  "description": "package-analyser 是一个简单易用的分析依赖以及依赖体积的命令行工具。",
   "keywords": [
     "package",
     "analyze",
@@ -37,7 +37,7 @@
     "*.{js,css,md}": "prettier --write"
   },
   "bin": {
-    "an-cli": "./dist/bin/index.js"
+    "ana-cli": "./dist/bin/index.js"
   },
   "dependencies": {
     "commander": "^11.0.0",

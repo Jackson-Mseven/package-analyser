@@ -35,25 +35,31 @@ module.exports = function (
      * @returns { object } data：依赖信息
      */
     async function getData(depth: string = "Infinity") {
+      const date = Date.now()
       const dependHash = await getDependHash(depth, packageManagementTools);
       const devPendHash = await getDependHash(depth, packageManagementTools, field.devDependencies);
-      const dependToVersionsObj = dependHash_To_nameVersionsObj(dependHash);
-      const devDependToVersionsObj = dependHash_To_nameVersionsObj(devPendHash);
+      console.log(Date.now() - date);
+      const dependToVersions = dependHash_To_nameVersionsObj(dependHash);
+      const devDependToVersions = dependHash_To_nameVersionsObj(devPendHash);
+      console.log(Date.now() - date);
       const dependencyHoop = findHoopAndShow(dependHash);
       const devDependencyHoop = findHoopAndShow(devPendHash);
+      console.log(Date.now() - date);
       let dependentSizes  // 依赖大小
       await calculateDependentSize(packageManagementTools).then((val: Map<string, string>) => {
         dependentSizes = (Object.fromEntries(val))
       })
+      console.log(Date.now() - date);
 
       return {
         dependHash,
         devPendHash,
-        dependToVersionsObj,
-        devDependToVersionsObj,
+        dependToVersions,
+        devDependToVersions,
         dependencyHoop,
         devDependencyHoop,
-        dependentSizes
+        dependentSizes,
+        depth
       };
     }
 
@@ -64,7 +70,9 @@ module.exports = function (
           const time = state.mtime.toString();
           fileS.readFile('./time.txt', async (err: Error, data: string) => { // 读取 time.txt
             if (!err && data.toString() === time) { // package.json 没有改变
-              resolve(depth || 'Infinity')
+              resolve({
+                depth: depth || 'Infinity'
+              })
             } else { // 初始化 或 package.json 改变了
               await getData().then(val => {
                 fileS.writeFile('./time.txt', time, (err: Error) => {
