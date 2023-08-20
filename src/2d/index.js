@@ -8,7 +8,7 @@ async function getData() {
       show(JSON.parse(JSON.stringify(res.data)));
     })
     .catch((err) => {
-      throw err
+      throw err;
     });
 }
 getData();
@@ -166,9 +166,11 @@ const handleDataStrategy = {
 };
 
 const show = (res) => {
-  if (Object.keys(res).length === 1) { // package.json 没有改变，接收 depth
+  if (Object.keys(res).length === 1) {
+    // package.json 没有改变，接收 depth
     handleDataStrategy.unchanged(res);
-  } else { // package.json 改变了，接收 对象
+  } else {
+    // package.json 改变了，接收 对象
     handleDataStrategy.changed(res);
   }
 
@@ -577,10 +579,11 @@ const show = (res) => {
         backBtn.click();
         d3.select('#SVG g').node().style = 'display:block';
       },
-      Math.max(data.nodes.length * 2, 800) + data.links.length * 5,
-      1200
-    )
-
+      Math.min(
+        Math.max(data.nodes.length * 2 + data.links.length * 5, 900),
+        1500
+      )
+    );
 
     // 视口大小发生变化时更新元素位置
     const updateViewPort = () => {
@@ -736,7 +739,7 @@ const show = (res) => {
   });
   toggleMode(dependencies);
   polyline.click();
-  visibleRingBtn(JSON.parse(localStorage.getItem('dependToVersionsObj'))[0]);
+  showDepend(JSON.parse(localStorage.getItem('dependToVersionsObj')));
 
   // 初始化侧边栏
   const asideInit = () => {
