@@ -1,3 +1,5 @@
+// import * as packageInfo from (process.cwd().replace(/\\/g, '/') + "/package.json")
+
 // 获取数据
 async function getData() {
   await axios
@@ -6,127 +8,169 @@ async function getData() {
       show(JSON.parse(JSON.stringify(res.data)));
     })
     .catch((err) => {
-      throw err
+      throw err;
     });
 }
 getData();
 
 let dependHash; // 生产依赖数据
 let devPendHash; // 开发依赖数据
-let dependToVersionsObj; // 生成依赖版本信息
-let devDependToVersionsObj; // 开发依赖版本信息
+let dependToVersions; // 生成依赖版本信息
+let devDependToVersions; // 开发依赖版本信息
 let dependencyHoop; // 生产依赖环状数据
 let devDependencyHoop; // 开发依赖环状数据
-let dependencyHoopObj; // 生成依赖环状原始信息
-let devDependencyHoopObj; // 开发依赖环状原始信息
 
 // 处理数据
 const handleDataStrategy = {
-  unchanged: function (json) {
-    console.log(json);
-    // 使用 localStorage 中的数据
-    dependHash = JSON.parse(localStorage.getItem('dependHash'));
-    devPendHash = JSON.parse(localStorage.getItem('devPendHash'));
-    dependToVersionsObj = JSON.parse(
-      localStorage.getItem('dependToVersionsObj')
-    );
-    devDependToVersionsObj = JSON.parse(
-      localStorage.getItem('devDependToVersionsObj')
-    );
-    dependencyHoop = JSON.parse(localStorage.getItem('dependencyHoop'));
-    devDependencyHoop = JSON.parse(localStorage.getItem('devDependencyHoop'));
-    dependencyHoopObj = JSON.parse(localStorage.getItem('dependencyHoopObj'));
-    devDependencyHoopObj = JSON.parse(
-      localStorage.getItem('devDependencyHoopObj')
-    );
-    dependentSizes = JSON.parse(localStorage.getItem('dependentSizes'));
+  /**
+   * 获取深度的数据
+   * @param { string } env：环境
+   */
+  getDepthData: function (data, depth) {
+    depth = Number(depth);
+    const dependentInfo = new Map();
+    if (Object.keys(data).length) {
+      const head = Object.keys(data)[0]; // 根节点
+      const queue = [head];
+      while (depth--) { // 深度递减直到为0
+        let len = queue.length; // 每一个深度应该遍历的节点数
+        while (len--) {
+          const node = queue.shift();
+          const values = data[node];
+          dependentInfo.set(node, values);
+          Object.entries(values).forEach(item => {
+            queue.push(item[0] + ' : ' + item[1]);
+          })
+        }
+      }
+      queue.forEach(item => {
+        dependentInfo.set(item, {});
+      })
+    }
+    return Object.fromEntries(dependentInfo);
   },
-  changed: function (json) {
-    // 转换JSON格式
-    const convertJsonToArrays = (data) => {
-      let nodes = [];
-      let links = [];
-      let nodeIndex = 0;
-      const processNode = (id, value, parent = null) => {
-        const nodeId = id.trim();
-        if (!nodes.find((node) => node.id == nodeId)) {
-          nodeIndex++;
-          nodes.push({ id: nodeId, index: nodeIndex });
+
+  getDepthVersion: function (data) {
+    const versionMap = new Map();
+    Object.keys(data).forEach(item => {
+      const name = item.split(' : ')[0]
+      const version = item.split(' : ')[1]
+      if (versionMap.has(name)) { // 多个版本
+        const versions = versionMap.get(name);
+        versionMap.set(name, [...versions, version]);
+      } else { // 第一个版本
+        versionMap.set(name, [version]);
+      }
+    })
+    return Object.fromEntries(versionMap)
+  },
+  /**
+   * 获取渲染的数据
+   */
+  getRenderData: function (json) {
+    // 1、处理深度
+    if (json.depth !== 'Infinity') { // 局部递归
+      dependHash = this.getDepthData(JSON.parse(localStorage.getItem('dependHashObj')), json.depth);
+      devPendHash = this.getDepthData(JSON.parse(localStorage.getItem('devPendHashObj')), json.depth);
+      dependencyHoop = this.getDepthData(JSON.parse(localStorage.getItem('dependencyHoopObj'))[1], json.depth);
+      devDependencyHoop = this.getDepthData(JSON.parse(localStorage.getItem('devDependencyHoopObj'))[1], json.depth);
+    } else { // 全局递归
+      dependHash = JSON.parse(localStorage.getItem('dependHashObj'));
+      devPendHash = JSON.parse(localStorage.getItem('devPendHashObj'));
+      dependencyHoop = JSON.parse(localStorage.getItem('dependencyHoopObj'))[1];
+      devDependencyHoop = JSON.parse(localStorage.getItem('devDependencyHoopObj'))[1];
+    }
+
+    // 2、获取版本
+    dependToVersions = this.getDepthVersion(dependHash)
+    devDependToVersions = this.getDepthVersion(devPendHash)
+
+    // 3、处理格式
+    dependHash = this.convertJsonToArrays(dependHash);
+    devPendHash = this.convertJsonToArrays(devPendHash);
+    dependencyHoop = this.convertJsonToArrays(dependencyHoop);
+    devDependencyHoop = this.convertJsonToArrays(devDependencyHoop);
+
+    sessionStorage.setItem("dependHash", JSON.stringify(dependHash))
+    sessionStorage.setItem("devPendHash", JSON.stringify(devPendHash))
+    sessionStorage.setItem("dependToVersions", JSON.stringify(dependToVersions))
+    sessionStorage.setItem("devDependToVersions", JSON.stringify(devDependToVersions))
+    sessionStorage.setItem("dependencyHoop", JSON.stringify(dependencyHoop))
+    sessionStorage.setItem("devDependencyHoop", JSON.stringify(devDependencyHoop))
+  },
+  /**
+   *  转换 JSON 格式
+   * @param { object{ name: version } } data：数据
+   * @returns 
+   */
+  convertJsonToArrays: function (data) {
+    let nodes = [];
+    let links = [];
+    let nodeIndex = 0;
+    const processNode = (id, value, parent = null) => {
+      const nodeId = id.trim();
+      if (!nodes.find((node) => node.id == nodeId)) {
+        nodeIndex++;
+        nodes.push({ id: nodeId, index: nodeIndex });
+      }
+      if (parent) {
+        const sourceNodeId = parent.trim();
+        const targetNodeId = nodeId;
+        links.push({
+          source: sourceNodeId,
+          target: targetNodeId,
+          value: 1,
+        });
+      }
+      if (typeof value == 'object') {
+        for (let key in value) {
+          const childId = key.trim();
+          const childValue = value[key].trim();
+          if (typeof childValue == 'string') {
+            const targetNodeId = childId + ' : ' + childValue;
+            if (!nodes.find((node) => node.id == targetNodeId)) {
+              nodeIndex++;
+              nodes.push({ id: targetNodeId, index: nodeIndex });
+            }
+            links.push({
+              source: nodeId,
+              target: targetNodeId,
+              value: 1,
+            });
+          } else processNode(childId, childValue, nodeId);
         }
-        if (parent) {
-          const sourceNodeId = parent.trim();
-          const targetNodeId = nodeId;
-          links.push({
-            source: sourceNodeId,
-            target: targetNodeId,
-            value: 1,
-          });
-        }
-        if (typeof value == 'object') {
-          for (let key in value) {
-            const childId = key.trim();
-            const childValue = value[key].trim();
-            if (typeof childValue == 'string') {
-              const targetNodeId = childId + ' : ' + childValue;
-              if (!nodes.find((node) => node.id == targetNodeId)) {
-                nodeIndex++;
-                nodes.push({ id: targetNodeId, index: nodeIndex });
-              }
-              links.push({
-                source: nodeId,
-                target: targetNodeId,
-                value: 1,
-              });
-            } else processNode(childId, childValue, nodeId);
-          }
-        }
-      };
-      for (let key in data) processNode(key, data[key]);
-      return { nodes, links };
+      }
     };
+    for (let key in data) processNode(key, data[key]);
+    return { nodes, links };
+  },
+  // 依赖没有变
+  unchanged: function (json) {
+    // 1、处理深度并且转换格式
+    this.getRenderData(json)
+  },
+  // 依赖改变了
+  changed: function (json) {
+    // 1、存储原始数据
+    localStorage.setItem('dependHashObj', JSON.stringify(json.dependHash));
+    localStorage.setItem('devPendHashObj', JSON.stringify(json.devPendHash));
+    localStorage.setItem('dependToVersionsObj', JSON.stringify(json.dependToVersions));
+    localStorage.setItem('devDependToVersionsObj', JSON.stringify(json.devDependToVersions));
+    localStorage.setItem('dependencyHoopObj', JSON.stringify(json.dependencyHoop));
+    localStorage.setItem('devDependencyHoopObj', JSON.stringify(json.devDependencyHoop));
+    localStorage.setItem('dependentSizes', JSON.stringify(json.dependentSizes));
 
-    // 使用接收的数据，并存储在 localStorage 中
-    dependHash = convertJsonToArrays(json.dependHash);
-    devPendHash = convertJsonToArrays(json.devPendHash);
-    dependToVersionsObj = json.dependToVersionsObj;
-    devDependToVersionsObj = json.devDependToVersionsObj;
-    dependencyHoop = convertJsonToArrays(json.dependencyHoop[1]);
-    devDependencyHoop = convertJsonToArrays(json.devDependencyHoop[1]);
-    dependencyHoopObj = json.dependencyHoop;
-    devDependencyHoopObj = json.devDependencyHoop;
-    dependentSizes = json.dependentSizes;
-
-    localStorage.setItem('dependHash', JSON.stringify(dependHash));
-    localStorage.setItem('devPendHash', JSON.stringify(devPendHash));
-    localStorage.setItem(
-      'dependToVersionsObj',
-      JSON.stringify(dependToVersionsObj)
-    );
-    localStorage.setItem(
-      'devDependToVersionsObj',
-      JSON.stringify(devDependToVersionsObj)
-    );
-    localStorage.setItem('dependencyHoop', JSON.stringify(dependencyHoop));
-    localStorage.setItem(
-      'devDependencyHoop',
-      JSON.stringify(devDependencyHoop)
-    );
-    localStorage.setItem(
-      'dependencyHoopObj',
-      JSON.stringify(dependencyHoopObj)
-    );
-    localStorage.setItem(
-      'devDependencyHoopObj',
-      JSON.stringify(devDependencyHoopObj)
-    );
-    localStorage.setItem('dependentSizes', JSON.stringify(dependentSizes));
+    // 2、处理深度并且转换格式
+    this.getRenderData(json)
   },
 };
 
 const show = (res) => {
-  if (typeof res === 'string' || typeof res === 'number') { // package.json 没有改变，接收 depth
+  if (Object.keys(res).length === 1) {
+    // package.json 没有改变，接收 depth
     handleDataStrategy.unchanged(res);
-  } else { // package.json 改变了，接收 对象
+  } else {
+    // package.json 改变了，接收 对象
     handleDataStrategy.changed(res);
   }
 
@@ -535,10 +579,11 @@ const show = (res) => {
         backBtn.click();
         d3.select('#SVG g').node().style = 'display:block';
       },
-        Math.max(data.nodes.length * 2, 800) + data.links.length * 5,
-        1200
+      Math.min(
+        Math.max(data.nodes.length * 2 + data.links.length * 5, 900),
+        1500
       )
-
+    );
 
     // 视口大小发生变化时更新元素位置
     const updateViewPort = () => {
@@ -604,46 +649,46 @@ const show = (res) => {
     }
   });
 
-	// 展示环状数据
-	const showRingBtn = document.querySelector(`.ring`);
-	let isOn = false;
-	let ringData;
-	showRingBtn.addEventListener('click', () => {
-		showRingBtn.classList.add('can');
-		isOn = !isOn;
-		if (isOn) {
-			showRingBtn.innerHTML = '取消展示';
-			const svg = d3.select('#graph');
-			svg.remove();
-			if (inputData == dependHash) {
-				ringData = dependencyHoop;
-				RefFlag = 3;
-				showDepend(dependencyHoopObj[2]);
-			} else if (inputData == devPendHash) {
-				ringData = devDependencyHoop;
-				RefFlag = 4;
-				showDepend(devDependencyHoopObj[2]);
-			}
-			init(isPolyline, ringData);
-			flag = 3;
-			asideInit();
-		} else {
-			showRingBtn.innerHTML = '点击展示';
-			const svg = d3.select('#graph');
-			svg.remove();
-			init(isPolyline, inputData);
-			if (inputData == dependHash) {
-				flag = 3;
-				RefFlag = 1;
-				showDepend(dependToVersionsObj);
-			} else if (inputData == devPendHash) {
-				flag = 4;
-				RefFlag = 2;
-				showDepend(devDependToVersionsObj);
-			}
-			asideInit();
-		}
-	});
+  // 展示环状数据
+  const showRingBtn = document.querySelector(`.ring`);
+  let isOn = false;
+  let ringData;
+  showRingBtn.addEventListener('click', () => {
+    showRingBtn.classList.add('can');
+    isOn = !isOn;
+    if (isOn) {
+      showRingBtn.innerHTML = '取消展示';
+      const svg = d3.select('#graph');
+      svg.remove();
+      if (inputData == dependHash) {
+        ringData = dependencyHoop;
+        RefFlag = 3;
+        showDepend(JSON.parse(localStorage.getItem('dependencyHoopObj'))[2]);
+      } else if (inputData == devPendHash) {
+        ringData = devDependencyHoop;
+        RefFlag = 4;
+        showDepend(JSON.parse(localStorage.getItem('devDependencyHoopObj'))[2]);
+      }
+      init(isPolyline, ringData);
+      flag = 3;
+      asideInit();
+    } else {
+      showRingBtn.innerHTML = '点击展示';
+      const svg = d3.select('#graph');
+      svg.remove();
+      init(isPolyline, inputData);
+      if (inputData == dependHash) {
+        flag = 3;
+        RefFlag = 1;
+        showDepend(JSON.parse(localStorage.getItem('dependToVersionsObj')));
+      } else if (inputData == devPendHash) {
+        flag = 4;
+        RefFlag = 2;
+        showDepend(JSON.parse(localStorage.getItem('devDependToVersionsObj')));
+      }
+      asideInit();
+    }
+  });
 
   // 控制展示环按钮
   const visibleRingBtn = (data) => {
@@ -655,7 +700,7 @@ const show = (res) => {
       showRingBtn.style.display = 'none';
     }
   };
-  visibleRingBtn(dependencyHoopObj[0]);
+  visibleRingBtn(JSON.parse(localStorage.getItem('dependencyHoopObj'))[0]);
 
   let RefFlag = 1; // 用于判断侧边栏处于那个依赖  1:生产  2:开发  3:展示环
   // 切换依赖环境
@@ -667,11 +712,11 @@ const show = (res) => {
       svg.remove();
       inputData = dependHash;
       init(isPolyline, inputData);
-      showDepend(dependToVersionsObj);
+      showDepend(JSON.parse(localStorage.getItem('dependToVersionsObj')));
       toggleMode(dependencies);
       RefFlag = 1;
       asideInit();
-      visibleRingBtn(dependencyHoopObj[0]);
+      visibleRingBtn(JSON.parse(localStorage.getItem('dependencyHoopObj'))[0]);
       isOn = false;
       showRingBtn.innerHTML = '点击展示';
     }
@@ -683,18 +728,18 @@ const show = (res) => {
       svg.remove();
       inputData = devPendHash;
       init(isPolyline, inputData);
-      showDepend(devDependToVersionsObj);
+      showDepend(JSON.parse(localStorage.getItem('devDependToVersionsObj')));
       toggleMode(devDependencies);
       RefFlag = 2;
       asideInit();
-      visibleRingBtn(devDependencyHoopObj[0]);
+      visibleRingBtn(JSON.parse(localStorage.getItem('devDependencyHoopObj'))[0]);
       isOn = false;
       showRingBtn.innerHTML = '点击展示';
     }
   });
   toggleMode(dependencies);
   polyline.click();
-  showDepend(dependToVersionsObj);
+  showDepend(JSON.parse(localStorage.getItem('dependToVersionsObj')));
 
   // 初始化侧边栏
   const asideInit = () => {
