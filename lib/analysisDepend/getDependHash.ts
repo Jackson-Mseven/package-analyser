@@ -1,8 +1,9 @@
 import field from './field';
 import getNpmDependHash from './npm';
 import getPnpmDependHash from './pnpm';
-import { DenpendType, DependHash } from './type';
+import { DependHash } from './type';
 import { isNumberStr } from './utils';
+import getYarnDependHash from './yarn';
 
 export default function (depth: string, packageManagementTools: string) {
 	let d: number;
@@ -12,7 +13,7 @@ export default function (depth: string, packageManagementTools: string) {
 	const exeHash: Record<string, (d: number) => [DependHash, DependHash]> = {
 		pnpm: getPnpmDependHash,
 		npm: getNpmDependHash,
-		yarn: getNpmDependHash,
+		yarn: getYarnDependHash,
 	};
 	return exeHash[packageManagementTools](d);
 }

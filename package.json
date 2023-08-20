@@ -19,6 +19,7 @@
   "devDependencies": {
     "@types/js-yaml": "^4.0.5",
     "@types/node": "^20.4.5",
+    "@types/yarnpkg__lockfile": "^1.1.6",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "eslint": "^8.46.0",
     "eslint-config-prettier": "^8.9.0",
@@ -40,6 +41,7 @@
     "an-cli": "./dist/bin/index.js"
   },
   "dependencies": {
+    "@yarnpkg/lockfile": "^1.1.0",
     "commander": "^11.0.0",
     "express": "^4.18.2",
     "js-yaml": "^4.1.0",
