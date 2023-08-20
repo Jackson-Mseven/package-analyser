@@ -27,25 +27,29 @@ const handleDataStrategy = {
    * @param { string } env：环境
    */
   getDepthData: function (data, depth) {
-    const head = Object.keys(data)[0]; // 根节点
-    const queue = [head];
+    depth = Number(depth);
     const dependentInfo = new Map();
-    while (depth--) { // 深度递减直到为0
-      let len = queue.length; // 每一个深度应该遍历的节点数
-      while (len--) {
-        const node = queue.shift();
-        const values = data[node];
-        dependentInfo.set(node, values);
-        Object.entries(values).forEach(item => {
-          queue.push(item[0] + ' : ' + item[1]);
-        })
+    if (Object.keys(data).length) {
+      const head = Object.keys(data)[0]; // 根节点
+      const queue = [head];
+      while (depth--) { // 深度递减直到为0
+        let len = queue.length; // 每一个深度应该遍历的节点数
+        while (len--) {
+          const node = queue.shift();
+          const values = data[node];
+          dependentInfo.set(node, values);
+          Object.entries(values).forEach(item => {
+            queue.push(item[0] + ' : ' + item[1]);
+          })
+        }
       }
+      queue.forEach(item => {
+        dependentInfo.set(item, {});
+      })
     }
-    queue.forEach(item => {
-      dependentInfo.set(item, {});
-    })
     return Object.fromEntries(dependentInfo);
   },
+
   getDepthVersion: function (data) {
     const versionMap = new Map();
     Object.keys(data).forEach(item => {
@@ -162,7 +166,7 @@ const handleDataStrategy = {
 };
 
 const show = (res) => {
-  if (typeof res === 'string' || typeof res === 'number') { // package.json 没有改变，接收 depth
+  if (Object.keys(res).length === 1) { // package.json 没有改变，接收 depth
     handleDataStrategy.unchanged(res);
   } else { // package.json 改变了，接收 对象
     handleDataStrategy.changed(res);
