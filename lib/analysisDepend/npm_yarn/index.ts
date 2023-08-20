@@ -95,18 +95,6 @@ export const findDepend = (
 	}
 	return null;
 };
-// async function findDependTest() {
-//   const virtualFolder = await getVirtualFolder(targetPath);
-//   const pack = virtualFolder.file[field.packageJson];
-//   const dependencies = pack.dependencies;
-//   const depnendPack = Object.entries(dependencies || {}).map(
-//     ([name, versionCondition]) => {
-//       return findDepend(name, versionCondition, virtualFolder);
-//     }
-//   );
-//   console.log(virtualFolder);
-// }
-// findDependTest();
 
 const findDepend_ChildDepend = (
 	virtualFolder: Panalyze.VirtualFolder,
@@ -141,13 +129,6 @@ const findDepend_ChildDepend = (
 	return hash;
 };
 
-// async function test() {
-//   const virtualFolder = await getVirtualFolder(targetPath);
-//   const dependHash = findDepend_ChildDepend(virtualFolder);
-//   console.log(dependHash);
-//   debugger;
-// }
-// test();
 export default async function getNpm_YarnDependHash(
 	depth: number,
 	dependName: DenpendType = field.dependencies
