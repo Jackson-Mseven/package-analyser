@@ -72,7 +72,9 @@ export function handleHasCjsVersionObj(
 ) {
 	const newObj = obj || {};
 	Object.entries(obj || {}).forEach(([key, val]) => {
-		newObj[key] = val.split('/').pop()!;
+		const arr = val.split('/');
+		const version = arr.pop()!.split('_')[0]!;
+		newObj[key] = version;
 	});
 	return newObj;
 }

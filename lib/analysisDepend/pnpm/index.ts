@@ -2,11 +2,7 @@ import * as yaml from 'js-yaml';
 import * as fs from 'fs';
 import * as type from './type';
 import path = require('path');
-import {
-	getJsonFileObjPath,
-	handleHasCjsVersionObj,
-	nameVersionStringify,
-} from '../utils';
+import { getJsonFileObjPath, nameVersionStringify } from '../utils';
 import field from '../field';
 import { DenpendType, DependHash } from '../type';
 function getPnpmYamlObj() {
@@ -23,15 +19,25 @@ function getPnpmYamlObj() {
 }
 
 function getPnpmAllDependHash(depnedType: DenpendType = field.dependencies) {
+	function dependenciesVersionFormat(
+		dependencies: Record<string, string> | undefined
+	) {
+		const res: Record<string, string> = {};
+		Object.entries(dependencies || {}).forEach(([name, version]) => {
+			res[name] = version.split('_')[0];
+		});
+		return res;
+	}
 	const yamlObj = getPnpmYamlObj();
 	const hash: Record<string, Record<string, string>> = {};
 	Object.entries(yamlObj?.packages || {}).forEach(([key, value]) => {
 		const arr = key.split('/');
+		//删除第一个空字符
 		arr.shift();
-		const version = arr.pop()!;
+		const version = arr.pop()!.split('_')[0];
 		const name = arr.join('/');
-		hash[nameVersionStringify(name, version)] = handleHasCjsVersionObj(
-			value.dependencies || {}
+		hash[nameVersionStringify(name, version)] = dependenciesVersionFormat(
+			value.dependencies
 		);
 	});
 	//获取用户包的名字
@@ -40,7 +46,7 @@ function getPnpmAllDependHash(depnedType: DenpendType = field.dependencies) {
 		'./package.json'
 	));
 	const nameVersion = nameVersionStringify(entryPack.name, entryPack.version);
-	hash[nameVersion] = handleHasCjsVersionObj(yamlObj?.[depnedType] || {});
+	hash[nameVersion] = dependenciesVersionFormat(yamlObj?.[depnedType] || {});
 	return hash;
 }
 
