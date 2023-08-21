@@ -49,7 +49,6 @@ const handleDataStrategy = {
     }
     return Object.fromEntries(dependentInfo);
   },
-
   getDepthVersion: function (data) {
     const versionMap = new Map();
     Object.keys(data).forEach(item => {
