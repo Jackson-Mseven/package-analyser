@@ -88,10 +88,13 @@ function getNpmDependHash(d: number) {
 	const hash: DependHash = {};
 	const devHash: DependHash = {};
 	getDepend_childDepend(entryNode, entryNode.info.name!, hash);
-
+	const devDependencies: Record<string, string> = {};
+	devHash[nameVersionStringify(entryNode.info.name!, entryNode.info.version)] =
+		devDependencies;
 	Object.entries(entryNode.info.devDependencies || {}).forEach(
 		([packName, versionCondition]) => {
 			const targetNode = findDpendNode(packName, versionCondition, entryNode);
+			devDependencies[packName] = targetNode.info.version;
 			getDepend_childDepend(targetNode, packName, devHash);
 		}
 	);
