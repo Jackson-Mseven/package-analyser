@@ -76,10 +76,10 @@ module.exports = function (
                 // 读取 time.txt
                 if (!err && data.toString() === time) {
                   // package.json 没有改变
-                  resolve(depth || 'Infinity');
+                  resolve({ depth: depth || 'Infinity' });
                 } else {
                   // 初始化 或 package.json 改变了
-                  await getData()
+                  await getData(depth)
                     .then((val) => {
                       fileS.writeFile('./time.txt', time, (err: Error) => {
                         if (err) throw err;

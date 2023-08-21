@@ -89,7 +89,6 @@ const handleDataStrategy = {
     devPendHash = this.convertJsonToArrays(devPendHash);
     dependencyHoop = this.convertJsonToArrays(dependencyHoop);
     devDependencyHoop = this.convertJsonToArrays(devDependencyHoop);
-
     sessionStorage.setItem("dependHash", JSON.stringify(dependHash))
     sessionStorage.setItem("devPendHash", JSON.stringify(devPendHash))
     sessionStorage.setItem("dependToVersions", JSON.stringify(dependToVersions))

@@ -1,7 +1,7 @@
-# package-analyzer
+# package-analyser
 ## 介绍
 
-package-analyzer 是一个简单易用的分析依赖以及依赖体积的命令行工具。
+package-analyser 是一个简单易用的分析依赖以及依赖体积的命令行工具。
 
 它实现了：
 
@@ -18,12 +18,12 @@ package-analyzer 是一个简单易用的分析依赖以及依赖体积的命令
 ## 安装
 
 ```bash
-npm i package-analyzer -g
+npm i package-analyser -g
 ```
 
 >   注意：
 >
->   由于 package-analyzer 是一个命令行工具，所以一定要全局安装。
+>   由于 package-analyser 是一个命令行工具，所以一定要全局安装。
 
 ## 使用
 
@@ -59,4 +59,4 @@ analyze-cli analyze [depth] [jsonFile]
 
 ## 注意
 
-如果你手动将 localStorage 中的数据删除后不能正常
+如果你手动将 localStorage 中的数据删除后不能正常展示，请删除姓名根目录下的 time.txt 文件后，重新运行命令行。

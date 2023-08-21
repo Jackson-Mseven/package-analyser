@@ -38,7 +38,7 @@
     "*.{js,css,md}": "prettier --write"
   },
   "bin": {
-    "ana-cli": "./dist/bin/index.js"
+    "analyze-cli": "./dist/bin/index.js"
   },
   "dependencies": {
     "@yarnpkg/lockfile": "^1.1.0",
