@@ -65,7 +65,10 @@ function getPnpm6_0AllDependHash(
 		return res;
 	}
 	const hash: DependHash = {};
-	Object.entries(yamlObj.packages).forEach(([packName, info]) => {
+	Object.entries(yamlObj.packages).forEach(([packLink, info]) => {
+		const arr = packLink.slice(23).split('@');
+		arr.pop();
+		const packName = arr.join('@');
 		hash[nameVersionStringify(packName, info.version)] =
 			dependenciesVersionFormat(info.dependencies);
 	});
