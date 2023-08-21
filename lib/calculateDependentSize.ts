@@ -1,4 +1,5 @@
 const remote = require('remote-file-size')
+var fs = require('fs')
 const need = Object.keys(require(process.cwd().replace(/\\/g, '/') + '/package.json').dependencies)
 const needLen = need.length;
 

@@ -24,6 +24,8 @@ module.exports = function (
   dependencies: object,
   devDependencies: object
 ): Function {
+  console.log("packageManagementTools:---", packageManagementTools);
+
   /**
    * 命令行的执行逻辑代码
    * @param {string} depth：递归的深度
