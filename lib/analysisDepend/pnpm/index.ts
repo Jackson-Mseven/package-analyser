@@ -120,8 +120,8 @@ function getPnpmDependHash(/** 递归的最大深度*/ d: number) {
 	const nameVersion = nameVersionStringify(entryPack.name, entryPack.version);
 	const hash: DependHash = {};
 	const devHash: DependHash = {};
-	dfs(1, nameVersion, AllDependHash, hash);
-	dfs(1, nameVersion, AllDevDependHash, devHash);
+	dfs(0, nameVersion, AllDependHash, hash);
+	dfs(0, nameVersion, AllDevDependHash, devHash);
 	return [hash, devHash] as [DependHash, DependHash];
 }
 
