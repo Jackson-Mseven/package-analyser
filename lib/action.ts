@@ -35,20 +35,31 @@ module.exports = function (
      * @returns { object } data：依赖信息
      */
     async function getData(depth: string = 'Infinity') {
-      const [dependHash, devPendHash] = getDependHash(
-        depth,
-        packageManagementTools
-      );
+      console.log(depth);
+
+      let da = Date.now();
+      // 依赖关系
+      const [dependHash, devPendHash] = getDependHash(depth, packageManagementTools);
+      console.log(Date.now() - da);
+
+      // 依赖版本
       const dependToVersions = dependHash_To_nameVersionsObj(dependHash);
       const devDependToVersions = dependHash_To_nameVersionsObj(devPendHash);
+      console.log(Date.now() - da);
+
+      // 循环依赖
       const dependencyHoop = findHoopAndShow(dependHash);
       const devDependencyHoop = findHoopAndShow(devPendHash);
-      let dependentSizes; // 依赖大小
+      console.log(Date.now() - da);
+
+      // 依赖体积
+      let dependentSizes;
       await calculateDependentSize(packageManagementTools).then(
         (val: Map<string, string>) => {
           dependentSizes = Object.fromEntries(val);
         }
       );
+      console.log(Date.now() - da);
 
       return {
         dependHash,
@@ -62,57 +73,44 @@ module.exports = function (
       };
     }
 
-    const p: Promise<string | object> = new Promise(
-      (resolve: Function, reject: Function) => {
-        if (!jsonFile) {
-          // 网页显示
-          fileS.stat(
-            './package.json',
-            (err: Error, state: { mtime: number }) => {
-              // 读取 package.json 文件的状态
-              if (err) reject(err);
-              const time = state.mtime.toString();
-              fileS.readFile('./time.txt', async (err: Error, data: string) => {
-                // 读取 time.txt
-                if (!err && data.toString() === time) {
-                  // package.json 没有改变
-                  resolve({ depth: depth || 'Infinity' });
-                } else {
-                  // 初始化 或 package.json 改变了
-                  await getData(depth)
-                    .then((val) => {
-                      fileS.writeFile('./time.txt', time, (err: Error) => {
-                        if (err) throw err;
-                      });
-                      resolve(val);
-                    })
-                    .catch((err) => {
-                      reject(err);
-                    });
-                }
-              });
+    const p: Promise<string | object> = new Promise((resolve: Function, reject: Function) => {
+      if (!jsonFile) { // 网页显示
+        fileS.stat('./package.json', (err: Error, state: { mtime: number }) => { // 读取 package.json 文件的状态
+          if (err) reject(err);
+          const time = state.mtime.toString();
+          fileS.readFile('./time.txt', async (err: Error, data: string) => { // 读取 time.txt
+            if (!err && data.toString() === time) { // package.json 没有改变
+              resolve({ depth: depth || 'Infinity' });
+            } else {
+              // 初始化 或 package.json 改变了
+              await getData(depth)
+                .then((val) => {
+                  fileS.writeFile('./time.txt', time, (err: Error) => {
+                    if (err) throw err;
+                  });
+                  resolve(val);
+                })
+                .catch((err) => {
+                  reject(err);
+                });
             }
-          );
-        } else {
-          // 输出 JSON 文件
-          getData(depth)
-            .then((val) => {
-              resolve(val);
-            })
-            .catch((err) => {
-              reject(err);
-            });
-        }
+          });
+        });
+      } else { // 输出 JSON 文件
+        getData(depth).then((val) => {
+          resolve(val);
+        }).catch((err) => {
+          reject(err);
+        });
       }
+    }
     );
 
     p.then((val: object | string) => {
-      if (!jsonFile) {
-        // 网页显示
+      if (!jsonFile) { // 网页显示
         const server: Function = require('./server');
         server(val);
-      } else {
-        // 输出 JSON 文件
+      } else { // 输出 JSON 文件
         fs.writeFile(jsonFile, JSON.stringify(val as object, null, 2));
       }
     }).catch((err) => {
