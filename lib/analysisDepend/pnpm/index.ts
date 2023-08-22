@@ -111,7 +111,7 @@ function getPnpmDependHash(/** 递归的最大深度*/ d: number) {
 		allHash: DependHash,
 		hash: DependHash
 	) {
-		if (depth > d || hash[nameVersion]) return;
+		if (depth >= d || hash[nameVersion]) return;
 		hash[nameVersion] = allHash[nameVersion];
 		Object.entries(hash[nameVersion] || {}).forEach(([name, version]) => {
 			dfs(depth + 1, nameVersionStringify(name, version), allHash, hash);

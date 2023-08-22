@@ -68,8 +68,10 @@ function getNpmDependHash(d: number) {
 	function getDepend_childDepend(
 		node: type.DependNode,
 		nodePackName: string,
-		hash: DependHash
+		hash: DependHash,
+		depth: number
 	) {
+		if (depth >= d) return;
 		const nameVersion = nameVersionStringify(nodePackName, node.info.version);
 		//如果已经时出现过的版本则忽视
 		if (hash[nameVersion]) return;
@@ -79,7 +81,7 @@ function getNpmDependHash(d: number) {
 			([packName, versionCondition]) => {
 				const targetNode = findDpendNode(packName, versionCondition, node);
 				dependencies[packName] = targetNode.info.version;
-				getDepend_childDepend(targetNode, packName, hash);
+				getDepend_childDepend(targetNode, packName, hash, depth + 1);
 			}
 		);
 	}
@@ -87,7 +89,7 @@ function getNpmDependHash(d: number) {
 
 	const hash: DependHash = {};
 	const devHash: DependHash = {};
-	getDepend_childDepend(entryNode, entryNode.info.name!, hash);
+	getDepend_childDepend(entryNode, entryNode.info.name!, hash, 0);
 	const devDependencies: Record<string, string> = {};
 	devHash[nameVersionStringify(entryNode.info.name!, entryNode.info.version)] =
 		devDependencies;
@@ -95,7 +97,7 @@ function getNpmDependHash(d: number) {
 		([packName, versionCondition]) => {
 			const targetNode = findDpendNode(packName, versionCondition, entryNode);
 			devDependencies[packName] = targetNode.info.version;
-			getDepend_childDepend(targetNode, packName, devHash);
+			getDepend_childDepend(targetNode, packName, devHash, 1);
 		}
 	);
 	return [hash, devHash] as [DependHash, DependHash];

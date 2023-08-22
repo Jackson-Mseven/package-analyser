@@ -28,8 +28,10 @@ function getYarnDependHash(d: number) {
 		packName: string,
 		version: string,
 		dependencies: Record<string, string>,
-		hash: DependHash
+		hash: DependHash,
+		depth: number
 	) {
+		if (depth >= d) return;
 		const nameToInfo = getInfoByDepend(dependencies);
 		const nameVersion = nameVersionStringify(packName, version);
 		if (hash[nameVersion]) return;
@@ -38,7 +40,7 @@ function getYarnDependHash(d: number) {
 		Object.entries(nameToInfo || {}).forEach(([packName, info]) => {
 			const { version, dependencies } = info;
 			depend[packName] = version;
-			if (dependencies) dfs(packName, version, dependencies, hash);
+			if (dependencies) dfs(packName, version, dependencies, hash, depth + 1);
 		});
 	}
 	const { name, version, dependencies, devDependencies } = require(path.join(
@@ -46,9 +48,9 @@ function getYarnDependHash(d: number) {
 		'package.json'
 	)) as Package;
 	const hash: DependHash = {};
-	dfs(name, version, dependencies, hash);
+	dfs(name, version, dependencies, hash, 0);
 	const devHash: DependHash = {};
-	dfs(name, version, devDependencies, devHash);
+	dfs(name, version, devDependencies, devHash, 0);
 	return [hash, devHash] as [DependHash, DependHash];
 }
 
