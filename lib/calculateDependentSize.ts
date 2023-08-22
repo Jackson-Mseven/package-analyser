@@ -1,4 +1,5 @@
 const remote = require('remote-file-size')
+const jsYaml = require('js-yaml')
 var fs = require('fs')
 const need = Object.keys(require(process.cwd().replace(/\\/g, '/') + '/package.json').dependencies)
 const needLen = need.length;
@@ -48,12 +49,12 @@ async function getYarnSizes() {
     Object.keys(urlJSON).forEach((item, index) => {
       if (need.includes(item.split('@')[0])) {
         const key = item.replace(/@(\^|~)?/i, ' : ')
-        remote(urlJSON[item], (err: Error, size: number) => {
+        const remoteURL = urlJSON[item].slice(0, urlJSON[item].indexOf('tgz') + 3) // 远程地址
+        remote(remoteURL.replace('yarnpkg', 'npmmirror'), (err: Error, size: number) => {
           if (err) reject(err)
           sizeMap.set(key, (size / 1024).toFixed(2) + 'kB')
           if (sizeMap.size === needLen) resolve(sizeMap)
         })
-        need.splice(need.indexOf(item.split('@')[0]), 1)
       }
     })
   })
@@ -70,43 +71,45 @@ async function getYarnSizes() {
  * 处理 pnpm 包
  */
 async function getPnpmSizes() {
-  const message = fs.readFileSync('./pnpm-lock.yaml', 'utf8')
-  const packages = message.split('packages:')[1]
-  const arr = packages.split('tarball: ')
-  const p = new Promise((resolve: Function, reject: Function) => {
-    const sizeMap = new Map();
-    const len = need.length;
-    for (let i = 0; i < arr.length - 1; i++) {
-      const nameStartIndex = arr[i].lastIndexOf('registry.npmmirror.com/')
-      const nameEndIndex = arr[i].slice(nameStartIndex).indexOf(':') + nameStartIndex
-      const urlIndex = arr[i + 1].indexOf('}')
-      const nameNoVersion = arr[i].slice(nameStartIndex + 23, nameEndIndex).split('@')[0]
-      if (need.includes(nameNoVersion)) {
-        const name = arr[i].slice(nameStartIndex + 23, nameEndIndex).replace(/@(\^|~)?/i, ' : ') // 包名
-        const url = arr[i + 1].slice(0, urlIndex) // 地址
-        remote(url, (err: Error, size: number) => {
-          if (err) reject(err)
-          sizeMap.set(name, (size / 1024).toFixed(2) + 'kB')
-          if (sizeMap.size === needLen) resolve(sizeMap)
-        })
-        need.splice(need.indexOf(nameNoVersion), 1)
+  try {
+    const doc = jsYaml.load(fs.readFileSync('./pnpm-lock.yaml', 'utf8')).packages;
+    const urlMap = new Map() // 远程地址
+    for (const item of Object.keys(doc)) {
+      const name = item.split('@')[0].slice(1)
+      const version = item.split('@')[1]
+      if (need.includes(name)) {
+        urlMap.set(name + ' : ' + version, "https://registry.npmmirror.com/" + name + /-/ + name + '-' + version + '.tgz')
+        if (urlMap.size === needLen) break
       }
     }
-  })
-  let res
-  await p.then(val => {
-    res = val
-  }).catch(err => {
+    const p = new Promise((resolve, reject) => {
+      const sizeMap = new Map() // 体积
+      Array.from(urlMap.keys()).forEach(item => {
+        remote(urlMap.get(item), (err: Error, size: number) => {
+          if (err) reject(err)
+          sizeMap.set(item, (size / 1024).toFixed(2) + 'kB')
+          if (sizeMap.size === needLen) resolve(sizeMap)
+        })
+      })
+    })
+    let res;
+    await p.then(val => {
+      res = val
+    }).catch(err => {
+      throw err
+    })
+    return res;
+  } catch (err) {
     throw err
-  })
-  return res
+  }
 }
 
 module.exports = async function (packageManagementTools: string) {
   const map: Map<string, Function> = new Map([
     ['npm', getNpmSizes],
     ['yarn', getYarnSizes],
-    ['pnpm', getPnpmSizes]])
+    ['pnpm', getPnpmSizes]
+  ]);
   let res;
   await map.get(packageManagementTools)!().then((val: Map<string, string>) => {
     res = val

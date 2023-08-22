@@ -35,22 +35,18 @@ module.exports = function (
      * @returns { object } data：依赖信息
      */
     async function getData(depth: string = 'Infinity') {
-      console.log(depth);
-
-      let da = Date.now();
       // 依赖关系
       const [dependHash, devPendHash] = getDependHash(depth, packageManagementTools);
-      console.log(Date.now() - da);
+      console.log("dependHash:---", dependHash);
+      console.log('depth:---', depth);
 
       // 依赖版本
       const dependToVersions = dependHash_To_nameVersionsObj(dependHash);
       const devDependToVersions = dependHash_To_nameVersionsObj(devPendHash);
-      console.log(Date.now() - da);
 
       // 循环依赖
       const dependencyHoop = findHoopAndShow(dependHash);
       const devDependencyHoop = findHoopAndShow(devPendHash);
-      console.log(Date.now() - da);
 
       // 依赖体积
       let dependentSizes;
@@ -59,7 +55,6 @@ module.exports = function (
           dependentSizes = Object.fromEntries(val);
         }
       );
-      console.log(Date.now() - da);
 
       return {
         dependHash,

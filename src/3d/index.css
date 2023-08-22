@@ -1,11 +1,11 @@
-*{
+* {
   overflow: hidden;
 }
 
-button{
+button {
   margin-bottom: 5vh;
 }
 
-#graph-3d{
-  height: 85vh;
+#graph-3d {
+  height: 100vh;
 }
