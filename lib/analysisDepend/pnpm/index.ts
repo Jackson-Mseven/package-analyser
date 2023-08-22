@@ -66,11 +66,13 @@ function getPnpm6_0AllDependHash(
 	}
 	const hash: DependHash = {};
 	Object.entries(yamlObj.packages).forEach(([packLink, info]) => {
-		const arr = packLink.slice(23).split('@');
-		arr.pop();
-		const packName = arr.join('@');
-		hash[nameVersionStringify(packName, info.version)] =
-			dependenciesVersionFormat(info.dependencies);
+		if (/^registry.npmmirror.com\//.test(packLink)) packLink.slice(22);
+		const arr = packLink.split('@');
+		const version = arr.pop()!;
+		const packName = arr.join('@').slice(1);
+		hash[nameVersionStringify(packName, version)] = dependenciesVersionFormat(
+			info.dependencies
+		);
 	});
 	//获取用户包的名字
 	const entryPack = require(path.join(
