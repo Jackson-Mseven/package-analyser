@@ -34,11 +34,9 @@ module.exports = function (
      * 获取依赖信息
      * @returns { object } data：依赖信息
      */
-    async function getData(depth: string = 'Infinity') {
+    async function getData(dep: string = "Infinity") {
       // 依赖关系
-      const [dependHash, devPendHash] = getDependHash(depth, packageManagementTools);
-      console.log("dependHash:---", dependHash);
-      console.log('depth:---', depth);
+      const [dependHash, devPendHash] = getDependHash(dep, packageManagementTools);
 
       // 依赖版本
       const dependToVersions = dependHash_To_nameVersionsObj(dependHash);
@@ -64,7 +62,7 @@ module.exports = function (
         dependencyHoop,
         devDependencyHoop,
         dependentSizes,
-        depth
+        depth: depth || "Infinity"
       };
     }
 
@@ -76,9 +74,8 @@ module.exports = function (
           fileS.readFile('./time.txt', async (err: Error, data: string) => { // 读取 time.txt
             if (!err && data.toString() === time) { // package.json 没有改变
               resolve({ depth: depth || 'Infinity' });
-            } else {
-              // 初始化 或 package.json 改变了
-              await getData(depth)
+            } else { // 初始化 或 package.json 改变了
+              await getData("Infinity")
                 .then((val) => {
                   fileS.writeFile('./time.txt', time, (err: Error) => {
                     if (err) throw err;
