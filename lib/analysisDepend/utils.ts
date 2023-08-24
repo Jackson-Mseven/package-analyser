@@ -1,7 +1,4 @@
-import * as fs from 'fs/promises';
 import * as semver from 'semver';
-import { Package } from './type';
-import { pathSymbol } from './Symbol';
 
 /**
  * 合法版本号是否符合条件
@@ -35,19 +32,6 @@ export function nameVersionParse(nameVersion: string) {
 	};
 }
 
-/** 通过路径获取JSON文件并解析成对象 */
-export async function getJsonFileObjPath(path: string) {
-	try {
-		const packJson = await fs.readFile(path, 'utf-8');
-		const pack = JSON.parse(packJson);
-		pack[pathSymbol] = path;
-		return pack as Package;
-	} catch (e) {
-		//这里暂时不做处理
-		return null;
-	}
-}
-
 export const isNumberStr = (s: string) => {
 	return /^-?\d*\.?\d+$/.test(s);
 };
@@ -65,16 +49,4 @@ export function dependHash_To_nameVersionsObj(
 		{}
 	);
 	return nameToVersion;
-}
-
-export function handleHasCjsVersionObj(
-	obj: Record<string, string> | undefined
-) {
-	const newObj = obj || {};
-	Object.entries(obj || {}).forEach(([key, val]) => {
-		const arr = val.split('/');
-		const version = arr.pop()!.split('_')[0]!;
-		newObj[key] = version;
-	});
-	return newObj;
 }
