@@ -1,7 +1,7 @@
 const remote = require('remote-file-size')
 const jsYaml = require('js-yaml')
 var fs = require('fs')
-const need = Object.keys(require(process.cwd().replace(/\\/g, '/') + '/package.json').dependencies)
+const need = Object.keys(require(process.cwd().replace(/\\/g, '/') + '/package.json').dependencies || {})
 const needLen = need.length;
 
 /**
@@ -9,6 +9,7 @@ const needLen = need.length;
  */
 async function getNpmSizes() {
   const packages = require(process.cwd().replace(/\\/g, '/') + '/node_modules/.package-lock.json').packages
+
   const urlMap = new Map()
   for (const key of Object.keys(packages)) {
     const arr = key.split('node_modules/')
@@ -106,6 +107,10 @@ async function getPnpmSizes() {
 }
 
 module.exports = async function (packageManagementTools: string) {
+  if (need.length === 0) {
+    return new Map();
+  }
+
   const map: Map<string, Function> = new Map([
     ['npm', getNpmSizes],
     ['yarn', getYarnSizes],
