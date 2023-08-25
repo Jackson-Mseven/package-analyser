@@ -72,11 +72,12 @@ async function getYarnSizes() {
  */
 async function getPnpmSizes() {
   try {
-    const doc = jsYaml.load(fs.readFileSync('./pnpm-lock.yaml', 'utf8')).packages;
+    const dependencies = jsYaml.load(fs.readFileSync('./pnpm-lock.yaml', 'utf8')).dependencies;
     const urlMap = new Map() // 远程地址
-    for (const item of Object.keys(doc)) {
-      const name = item.split('@')[0].slice(1)
-      const version = item.split('@')[1]
+
+    for (const item of Object.keys(dependencies)) {
+      const name = item
+      const version = dependencies[item]['specifier'].replace(/\^|~/, '')
       if (need.includes(name)) {
         urlMap.set(name + ' : ' + version, "https://registry.npmmirror.com/" + name + /-/ + name + '-' + version + '.tgz')
         if (urlMap.size === needLen) break
@@ -110,9 +111,11 @@ module.exports = async function (packageManagementTools: string) {
     ['yarn', getYarnSizes],
     ['pnpm', getPnpmSizes]
   ]);
+
   let res;
   await map.get(packageManagementTools)!().then((val: Map<string, string>) => {
     res = val
   })
+
   return res;
 }

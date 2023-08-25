@@ -48,11 +48,9 @@ module.exports = function (
 
       // 依赖体积
       let dependentSizes;
-      await calculateDependentSize(packageManagementTools).then(
-        (val: Map<string, string>) => {
-          dependentSizes = Object.fromEntries(val);
-        }
-      );
+      await calculateDependentSize(packageManagementTools).then((val: Map<string, string>) => {
+        dependentSizes = Object.fromEntries(val);
+      });
 
       return {
         dependHash,
@@ -72,7 +70,7 @@ module.exports = function (
           if (err) reject(err);
           const time = state.mtime.toString();
           fileS.readFile('./time.txt', async (err: Error, data: string) => { // 读取 time.txt
-            if (!err && data.toString() === time) { // package.json 没有改变
+            if (!err && data.toString() === time) { // 
               resolve({ depth: depth || 'Infinity' });
             } else { // 初始化 或 package.json 改变了
               await getData("Infinity")

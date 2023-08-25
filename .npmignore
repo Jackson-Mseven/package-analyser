@@ -1,5 +1,10 @@
-/node_modules
-/dist
-/.husky
-/.vscode
+.husky
+/bin
+/lib
+node_modules
+.vscode
 .gitignore
+.eslintrc.json
+.prettierrc.json
+settings.json
+tsconfig.json

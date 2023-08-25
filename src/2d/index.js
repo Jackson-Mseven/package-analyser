@@ -67,7 +67,6 @@ const handleDataStrategy = {
    * 获取渲染的数据
    */
   getRenderData: function (json) {
-    console.log('depth:---', json.depth);
     // 1、处理深度
     if (json.depth !== 'Infinity') { // 局部递归
       dependHash = this.getDepthData(JSON.parse(localStorage.getItem('dependHashObj')), json.depth);
@@ -80,7 +79,6 @@ const handleDataStrategy = {
       dependencyHoop = JSON.parse(localStorage.getItem('dependencyHoopObj'))[1];
       devDependencyHoop = JSON.parse(localStorage.getItem('devDependencyHoopObj'))[1];
     }
-    console.log("dependHash:---", dependHash);
 
     // 2、获取版本
     dependToVersions = this.getDepthVersion(dependHash)
