@@ -55,21 +55,31 @@ function getPnpm6_0AllDependHash(
 	depnedType: DenpendType = field.dependencies,
 	yamlObj: type.pnpmLockYaml6_0Obj
 ) {
+	function removeParentheses(str: string) {
+		return str.replace(/\([^()]*\)$/, '');
+	}
 	function dependenciesVersionFormat(
 		dependencies: Record<string, string> | undefined
 	) {
 		const res: Record<string, string> = {};
 		Object.entries(dependencies || {}).forEach(([name, version]) => {
+			version = removeParentheses(version);
 			res[name] = version.split('@').pop()!;
 		});
 		return res;
 	}
 	const hash: DependHash = {};
 	Object.entries(yamlObj.packages).forEach(([packLink, info]) => {
-		if (/^registry.npmmirror.com\//.test(packLink)) packLink.slice(22);
-		const arr = packLink.split('@');
+		//删除"@babel/helper-create-class-features-plugin@7.22.10(@babel/core@7.22.10)"这种后面带括号内容
+		packLink = removeParentheses(packLink);
+		//下面三行用来去除域前缀或者是除前面'/'
+		let arr = packLink.split('/');
+		arr.shift();
+		packLink = arr.join('/');
+		//后面是将版本号和包名分开
+		arr = packLink.split('@');
 		const version = arr.pop()!;
-		const packName = arr.join('@').slice(1);
+		const packName = arr.join('@');
 		hash[nameVersionStringify(packName, version)] = dependenciesVersionFormat(
 			info.dependencies
 		);
