@@ -267,8 +267,8 @@ const show = (res) => {
 	let cachedX = null; // 存储普通节点移动距离
 	let cachedY = null;
 	// 渲染依赖图
-	const init = (flag, data) => {
-		// true: 折线 ;false: 曲线
+	const init = (flag, data, noRoot = false) => {
+		// true: 折线 ;false: 曲线; noRoot:环状数据时无根节点
 		let cachedRootX = null;
 		let cachedRootY = null; // 存储根节点移动距离
 		let x = null;
@@ -396,8 +396,6 @@ const show = (res) => {
 			if (status == 'init' || !d3.event?.active) simulation.alphaTarget(0);
 			d.fx = null;
 			d.fy = null;
-			document.querySelector('#backBtn').disabled = true;
-			document.querySelector('#backRootBtn').disabled = true;
 
 			setTimeout(() => {
 				if (d.id == data.nodes[0].id) {
@@ -407,8 +405,6 @@ const show = (res) => {
 					cachedX = d.x;
 					cachedY = d.y;
 				}
-				document.querySelector('#backBtn').disabled = false;
-				document.querySelector('#backRootBtn').disabled = false;
 			}, 999);
 		};
 
@@ -501,14 +497,14 @@ const show = (res) => {
 
 			// 移动节点到最新位置
 			node.attr('transform', (d) => {
-				if (d.id == data.nodes[0].id)
+				if (d.id == data.nodes[0].id && !noRoot)
 					return `translate(${d.x}, ${d.y}) scale(1.8)`;
 				else return `translate(${d.x}, ${d.y})`;
 			});
 		});
 
 		const rootNode = node.filter((d) => d.id == data.nodes[0].id);
-		rootNode.attr('class', 'root');
+		if (!noRoot) rootNode.attr('class', 'root');
 
 		const horizontalForce = d3
 			.forceX()
@@ -662,7 +658,7 @@ const show = (res) => {
 			const defaultLinks = () => {
 				link.attr('class', 'link');
 				node.attr('class', (d) => {
-					if (d.index == 0) return 'root';
+					if (d.index == 0 && !noRoot) return 'root';
 					else return 'node';
 				});
 			};
@@ -671,7 +667,7 @@ const show = (res) => {
 				node.attr('class', (d) => {
 					if (d.id == hoveredNodeId) return 'node-hover';
 					else {
-						if (d.index == 0) return 'root';
+						if (d.index == 0 && !noRoot) return 'root';
 						else return 'node';
 					}
 				});
@@ -692,9 +688,11 @@ const show = (res) => {
 			svg.remove();
 			isPolyline = true;
 			if (showRingBtn.innerHTML == '取消展示') {
-				if (inputData == dependHash) init(isPolyline, dependencyHoop);
-				else if (inputData == devPendHash) init(isPolyline, devDependencyHoop);
+				if (inputData == dependHash) init(isPolyline, dependencyHoop, true);
+				else if (inputData == devPendHash)
+					init(isPolyline, devDependencyHoop, true);
 			} else init(isPolyline, inputData);
+			curve.classList.remove('active');
 			toggleMode(polyline);
 		}
 	});
@@ -704,9 +702,11 @@ const show = (res) => {
 			svg.remove();
 			isPolyline = false;
 			if (showRingBtn.innerHTML == '取消展示') {
-				if (inputData == dependHash) init(isPolyline, dependencyHoop);
-				else if (inputData == devPendHash) init(isPolyline, devDependencyHoop);
+				if (inputData == dependHash) init(isPolyline, dependencyHoop, true);
+				else if (inputData == devPendHash)
+					init(isPolyline, devDependencyHoop, true);
 			} else init(isPolyline, inputData);
+			polyline.classList.remove('active');
 			toggleMode(curve);
 		}
 	});
@@ -722,6 +722,8 @@ const show = (res) => {
 			showRingBtn.innerHTML = '取消展示';
 			const svg = d3.select('#graph');
 			svg.remove();
+			backRootBtn.disabled = true;
+			backRootBtn.classList.add('disabled');
 			if (inputData == dependHash) {
 				ringData = dependencyHoop;
 				RefFlag = 3;
@@ -731,13 +733,15 @@ const show = (res) => {
 				RefFlag = 4;
 				showDepend(JSON.parse(localStorage.getItem('devDependencyHoopObj'))[2]);
 			}
-			init(isPolyline, ringData);
+			init(isPolyline, ringData, true);
 			flag = 3;
 			asideInit();
 		} else {
 			showRingBtn.innerHTML = '点击展示';
 			const svg = d3.select('#graph');
 			svg.remove();
+			backRootBtn.disabled = false;
+			backRootBtn.classList.remove('disabled');
 			init(isPolyline, inputData);
 			if (inputData == dependHash) {
 				flag = 3;
@@ -775,12 +779,14 @@ const show = (res) => {
 			inputData = dependHash;
 			init(isPolyline, inputData);
 			showDepend(JSON.parse(localStorage.getItem('dependToVersionsObj')));
+			devDependencies.classList.remove('active');
 			toggleMode(dependencies);
 			RefFlag = 1;
 			asideInit();
 			visibleRingBtn(JSON.parse(localStorage.getItem('dependencyHoopObj'))[0]);
 			isOn = false;
 			showRingBtn.innerHTML = '点击展示';
+			document.querySelector('#backRootBtn').classList.remove('disabled');
 		}
 	});
 
@@ -791,6 +797,7 @@ const show = (res) => {
 			inputData = devPendHash;
 			init(isPolyline, inputData);
 			showDepend(JSON.parse(localStorage.getItem('devDependToVersionsObj')));
+			dependencies.classList.remove('active');
 			toggleMode(devDependencies);
 			RefFlag = 2;
 			asideInit();
@@ -799,6 +806,7 @@ const show = (res) => {
 			);
 			isOn = false;
 			showRingBtn.innerHTML = '点击展示';
+			document.querySelector('#backRootBtn').classList.remove('disabled');
 		}
 	});
 	toggleMode(dependencies);
@@ -898,10 +906,18 @@ const show = (res) => {
 						devPendHash.nodes.forEach((node) => {
 							if (node.id == item) highLight(item);
 						});
+					} else if (RefFlag == 3) {
+						dependencyHoop.nodes.forEach((node) => {
+							if (node.id == item) highLight(item);
+						});
+					} else if (RefFlag == 4) {
+						devDependencyHoop.nodes.forEach((node) => {
+							if (node.id == item) highLight(item);
+						});
 					}
 				});
 				li.addEventListener('mouseout', () => highLight(null, true));
-			} 
+			}
 		});
 	};
 	asideInit();
@@ -910,28 +926,7 @@ const show = (res) => {
 	else changedMode(false);
 };
 
-const toggleMode = (el) => {
-	const dependencies = document.querySelector(`#dependencies`);
-	const devDependencies = document.querySelector(`#devDependencies`);
-	const polyline = document.querySelector(`#polyline`);
-	const curve = document.querySelector(`#curve`);
-
-	if (['dependencies', 'devDependencies'].includes(el.id)) {
-		dependencies.style.backgroundColor = 'white';
-		dependencies.style.color = '#606266';
-		devDependencies.style.backgroundColor = 'white';
-		devDependencies.style.color = '#606266';
-		el.style.backgroundColor = '#409eff';
-		el.style.color = 'white';
-	} else if (['polyline', 'curve'].includes(el.id)) {
-		polyline.style.backgroundColor = 'white';
-		polyline.style.color = '#606266';
-		curve.style.backgroundColor = 'white';
-		curve.style.color = '#606266';
-		el.style.backgroundColor = '#409eff';
-		el.style.color = 'white';
-	}
-};
+const toggleMode = (el) => el.classList.add('active');
 
 const arrow = document.querySelector('#aside div');
 arrow.addEventListener('click', () => {
@@ -948,24 +943,19 @@ ThreeD.addEventListener('click', () => {
 
 // 切换白/夜间模式
 const changedMode = (init = true) => {
-	let body = document.body;
-	let smallGrid = document.querySelector('defs #smallGrid path');
-	let grid = document.querySelector('defs #grid path');
-	if (localStorage.getItem('mode') == 'day') {
-		mode.innerHTML = `夜间模式`;
-		smallGrid.setAttribute('stroke', 'gray');
-		grid.setAttribute('stroke', 'gray');
-		document.querySelector('.status').style.color = 'black';
-	} else if (localStorage.getItem('mode') == 'dark') {
-		mode.innerHTML = `白天模式`;
-		smallGrid.setAttribute('stroke', 'white');
-		grid.setAttribute('stroke', 'white');
-		document.querySelector('.status').style.color = 'white';
-	}
+	const body = document.body;
+	const mode = document.querySelector('#mode');
 	if (init) body.classList.toggle('dark');
 	else if (!init && localStorage.getItem('mode') == 'dark')
 		body.classList.add('dark'); //初始化时保存的是夜间模式更新背景色
+	if (body.classList.contains('dark')) mode.innerHTML = '白天模式';
+	else mode.innerHTML = '夜间模式';
+
+	const status = document.querySelector('.status');
+	const computedStyle = getComputedStyle(document.body);
+	status.style.color = computedStyle.getPropertyValue('--status-color');
 };
+
 const mode = document.querySelector('#mode');
 mode.addEventListener('click', () => {
 	if (localStorage.getItem('mode') == 'dark')

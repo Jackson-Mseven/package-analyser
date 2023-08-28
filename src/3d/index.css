@@ -9,3 +9,13 @@ button {
 #graph-3d {
   height: 100vh;
 }
+
+:root {
+  --background-color-day: white;
+  --background-color-dark: #7f7f7f;
+  --link-opacity-day: 1;
+  --link-opacity-dark: 0.4;
+  --node-color-day: black;
+  --node-color-dark: white;
+  --node-text-height: 4;
+}

@@ -48,11 +48,6 @@
   stroke-width: 2px;
 }
 
-.root:hover,
-.node:hover {
-  fill: rgba(255, 0, 0, 0.65);
-}
-
 .node-hover{
   fill: rgba(255, 0, 0, 0.65);
 }
@@ -61,6 +56,11 @@
   fill: rgba(33, 33, 33, 0.9);
   stroke: white;
   stroke-width: 2px;
+}
+
+.root:hover,
+.node:hover {
+  fill: rgba(255, 0, 0, 0.65);
 }
 
 #aside{
@@ -159,4 +159,9 @@ input[type="search"]{
 
 #aside li:hover{
   background: rgba(255,255,255,0.7);
+}
+
+.disabled{
+  background: rgba(255,255,255,0.7) !important;
+  color: #000 !important;
 }

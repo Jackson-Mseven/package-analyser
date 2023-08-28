@@ -44,13 +44,6 @@ button {
   vertical-align: middle;
 }
 
-#dependencies,
-#devDependencies {
-  border: 1px solid #dcdfe6;
-  background-color: #f4f4f5;
-  color: #909399;
-}
-
 #back,
 #size,
 #ThreeD,
@@ -65,3 +58,40 @@ button {
 button:hover {
   background-color: #8bc3fd !important;
 }
+
+
+/* 白天模式 */
+:root {
+  --small-grid-stroke: gray;
+  --grid-stroke: gray;
+  --status-color: black;
+}
+
+/* 夜间模式 */
+body.dark {
+  --small-grid-stroke: white;
+  --grid-stroke: white;
+  --status-color: white;
+}
+
+/* 使用自定义属性设置其他属性值 */
+#smallGrid path {
+  stroke: var(--small-grid-stroke);
+}
+
+#grid path {
+  stroke: var(--grid-stroke);
+}
+
+.status {
+  color: var(--status-color);
+}
+
+#dependencies.active,
+#devDependencies.active,
+#polyline.active,
+#curve.active {
+  background-color: #409eff;
+  color: white;
+}
+
