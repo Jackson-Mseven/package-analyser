@@ -50,7 +50,11 @@
 
 .root:hover,
 .node:hover {
-  fill: rgba(0, 0, 255, 0.55);
+  fill: rgba(255, 0, 0, 0.65);
+}
+
+.node-hover{
+  fill: rgba(255, 0, 0, 0.65);
 }
 
 .root {
