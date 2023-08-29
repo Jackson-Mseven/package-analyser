@@ -1,11 +1,18 @@
-# package-analyser
 
-< center>
-![Static Badge](https://img.shields.io/badge/experimental-orange)
-![Static Badge](https://img.shields.io/badge/license-Apache_2.0-orange)
-![GitHub package.json dynamic](https://img.shields.io/github/package-json/v/Jackson-Mseven/package-analyser)
+<h1 align="center">package-analyser</h1>
 
-< /center>
+<div align="center">
+
+![Static Badge](https://img.shields.io/badge/bulid-experimental-orange)
+![Static Badge](https://img.shields.io/badge/size-91.6KB-blue)
+ [![NPM version][npm-image]][npm-url]
+
+[npm-image]:https://img.shields.io/github/package-json/v/Jackson-Mseven/package-analyser
+[npm-url]: https://www.npmjs.com/package/package-analyser
+
+![Static Badge](https://img.shields.io/badge/license-Apache_2.0-yellow)
+
+</div>
 
 ## 介绍
 
@@ -51,7 +58,8 @@ analyze-cli analyze [depth] [jsonFile]
 
 ### 依赖图使用
 #### 2D
-< center>
+<div align="center">
+
 |  操作   |  效果  |
 |  :----:  | :----:  |
 | 左键节点  |  拖动节点 |
@@ -59,17 +67,20 @@ analyze-cli analyze [depth] [jsonFile]
 | 左键双击画布  |  放大视角 |
 | 侧边栏双击节点  | 跳转到节点 |
 | 滑动滚轮  | 放大缩小视角 |
-< /center>
+
+</div>
 
 #### 3D
-< center>
+<div align="center">
+
 |  操作   |  效果  |
 |  :----:  | :----:  |
 | 左键画布  | 旋转视角 |
 | 左键/右键节点  | 拖动节点 |
 | 右键画布  | 平移视角 |
 | 滑动滚轮  | 缩放视角 |
-< /center>
+
+</div>
 
 ## 注意
 

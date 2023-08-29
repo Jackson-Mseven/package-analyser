@@ -1,11 +1,16 @@
-# package-analyser
+<h1 align="center">package-analyser</h1>
 
-< center>
-![Static Badge](https://img.shields.io/badge/experimental-orange)
-![Static Badge](https://img.shields.io/badge/license-Apache_2.0-orange)
-![GitHub package.json dynamic](https://img.shields.io/github/package-json/v/Jackson-Mseven/package-analyser)
+<div align="center">
 
-< /center>
+![Static Badge](https://img.shields.io/badge/bulid-experimental-orange)
+![Static Badge](https://img.shields.io/badge/size-91.6KB-blue)
+ [![NPM version][npm-image]][npm-url]
+
+[npm-image]:https://img.shields.io/github/package-json/v/Jackson-Mseven/package-analyser
+[npm-url]: https://www.npmjs.com/package/package-analyser
+
+![Static Badge](https://img.shields.io/badge/license-Apache_2.0-yellow)
+</div>
 
 ## Introduction
 
@@ -51,6 +56,7 @@ analyze-cli analyze [depth] [jsonFile]
 
 ### Dependency Graph Usage
 #### 2D
+<div align="center">
 
 |   Action   |   Effect   |
 |   :----:   |   :----:   |
@@ -60,7 +66,10 @@ analyze-cli analyze [depth] [jsonFile]
 | Double-click on a node in the sidebar  | Jump to the node. |
 | Scroll the mouse wheel  | Zoom in or out the view. |
 
+</div>
+
 #### 3D
+<div align="center">
 
 |   Action   |   Effect   |
 |   :----:   |   :----:   |
@@ -68,6 +77,8 @@ analyze-cli analyze [depth] [jsonFile]
 | Left-click/Right-click on a node  | Drag the node. |
 | Right-click on the canvas  | Pan the view. |
 | Scroll the mouse wheel  | Zoom the view. |
+
+</div>
 
 ## Note
 If the data in the localStorage is manually deleted and cannot be displayed correctly, please delete the "time.txt" file in the project root directory and run the command again.
