@@ -10,7 +10,7 @@
         "size"
     ],
     "author": "Jackson-Mseven,leviash,幻小芒,xun-zi",
-    "license": "Apache-2.0",
+    "license": "MIT",
     "main": "./dist/bin/index.js",
     "scripts": {
         "test": "vitest",

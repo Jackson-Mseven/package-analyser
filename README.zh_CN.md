@@ -10,7 +10,7 @@
 [npm-image]:https://img.shields.io/github/package-json/v/Jackson-Mseven/package-analyser
 [npm-url]: https://www.npmjs.com/package/package-analyser
 
-![Static Badge](https://img.shields.io/badge/license-Apache_2.0-yellow)
+![Static Badge](https://img.shields.io/badge/license-MIT-yellow)
 
 </div>
 
