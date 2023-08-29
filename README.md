@@ -1,62 +1,65 @@
 # package-analyser
-## 介绍
+## Introduction
 
-package-analyser 是一个简单易用的分析依赖以及依赖体积的 NodeJS 命令行工具。
+package-analyser is a simple and easy-to-use NodeJS command-line tool for analyzing dependencies and dependency sizes.
 
-它实现了：
+It provides the following features:
 
-1.  分析生产、开发环境下的依赖关系
-2.  分析生产环境下的依赖体积
-3.  判断当前项目是否存在循环依赖（当存在循环依赖时可以展示循环依赖）
-4.  通过2D、3D的形式展示依赖关系
-    -   支持搜索某个依赖并进行定位
-    -   支持折线、曲线两种方式进行展示
-5.  通过可视化图表的形式展示依赖体积
-6.  支持日间、夜间两种模式
-7.  支持页面展示以及输出为 JSON 文件两种方式
+1.  Analyzing dependencies in production and development environments.
+2.  Analyzing dependency sizes in the production environment.
+3.  Detecting and displaying circular dependencies in the current project.
+4.  Visualizing dependency relationships in 2D and 3D:
+    -   Supports searching for a specific dependency and locating it.
+    -   Supports displaying dependencies as straight lines or curves.
+5.  Visualizing dependency sizes with charts.
+6.  Supports both light and dark modes.
+7.  Supports displaying results on a webpage or exporting them as JSON files.
 
-## 安装
+## README.md
+- en [English](./README.md)
+- zh_CN [中文](./readme/README.zh_CN.md)
+
+## Installation
 
 ```bash
 npm i package-analyser -g
 ```
 
->   注意：
+>  Note:
 >
->   由于 package-analyser 是一个命令行工具，所以一定要全局安装。
+>  Since package-analyser is a command-line tool, it needs to be installed globally.
 
-## 使用
+## Usage
 
-### 后台使用
+### Backend Usage
 
 ```bash
 /**
- * @param { number } depth：依赖的深度（限制为 整数 以及 Infinity）
- * @param { string } jsonFile：要输出的JSON文件的路径（相对于命令行执行的路径）
+ * @param {number} depth: The depth of dependencies (integer or Infinity).
+ * @param {string} jsonFile: The path to the output JSON file (relative to the current directory).
  */
 analyze-cli analyze [depth] [jsonFile]
 ```
 
-### 依赖图使用
-### 2D
+### Dependency Graph Usage
+#### 2D
 
-|  操作   |  效果  |
-|  :----:  | :----:  |
-| 左键节点  |  拖动节点 |
-| 左键画布  |  平移视角 |
-| 左键双击画布  |  放大视角 |
-| 侧边栏双击节点  | 跳转到节点 |
-| 滑动滚轮  | 放大缩小视角 |
+|   Action   |   Effect   |
+|   :----:   |   :----:   |
+| Left-click on a node  | Drag the node. |
+| Left-click on the canvas  | Pan the view. |
+| Double-click on the canvas  | Zoom in the view. |
+| Double-click on a node in the sidebar  | Jump to the node. |
+| Scroll the mouse wheel  | Zoom in or out the view. |
 
-### 3D
+#### 3D
 
-|  操作   |  效果  |
-|  :----:  | :----:  |
-| 左键画布  | 旋转视角 |
-| 左键/右键节点  | 拖动节点 |
-| 右键画布  | 平移视角 |
-| 滑动滚轮  | 缩放视角 |
+|   Action   |   Effect   |
+|   :----:   |   :----:   |
+| Left-click on the canvas  | Rotate the view. |
+| Left-click/Right-click on a node  | Drag the node. |
+| Right-click on the canvas  | Pan the view. |
+| Scroll the mouse wheel  | Zoom the view. |
 
-## 注意
-
-如果你手动将 localStorage 中的数据删除后不能正常展示，请删除项目根目录下的 time.txt 文件后，重新运行命令行。
+## Note
+If the data in the localStorage is manually deleted and cannot be displayed correctly, please delete the "time.txt" file in the project root directory and run the command again.
