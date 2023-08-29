@@ -1,6 +1,6 @@
 {
     "name": "package-analyser",
-    "version": "0.0.10",
+    "version": "1.0.3",
     "description": "package-analyser 是一个简单易用的分析依赖以及依赖体积的 NodeJS 命令行工具。",
     "keywords": [
         "package",

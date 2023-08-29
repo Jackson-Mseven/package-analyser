@@ -1,4 +1,12 @@
 # package-analyser
+
+< center>
+![Static Badge](https://img.shields.io/badge/experimental-orange)
+![Static Badge](https://img.shields.io/badge/license-Apache_2.0-orange)
+![GitHub package.json dynamic](https://img.shields.io/github/package-json/v/Jackson-Mseven/package-analyser)
+
+< /center>
+
 ## Introduction
 
 package-analyser is a simple and easy-to-use NodeJS command-line tool for analyzing dependencies and dependency sizes.
@@ -16,8 +24,8 @@ It provides the following features:
 7.  Supports displaying results on a webpage or exporting them as JSON files.
 
 ## README.md
-- en [English](./README.md)
-- zh_CN [中文](./readme/README.zh_CN.md)
+- en [English](README.md)
+- zh_CN [中文](README.zh_CN.md)
 
 ## Installation
 

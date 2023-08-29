@@ -1,4 +1,12 @@
 # package-analyser
+
+< center>
+![Static Badge](https://img.shields.io/badge/experimental-orange)
+![Static Badge](https://img.shields.io/badge/license-Apache_2.0-orange)
+![GitHub package.json dynamic](https://img.shields.io/github/package-json/v/Jackson-Mseven/package-analyser)
+
+< /center>
+
 ## 介绍
 
 package-analyser 是一个简单易用的分析依赖以及依赖体积的 NodeJS 命令行工具。
@@ -16,8 +24,8 @@ package-analyser 是一个简单易用的分析依赖以及依赖体积的 NodeJ
 7.  支持页面展示以及输出为 JSON 文件两种方式
 
 ## README.md
-- en [English](../README.md)
-- zh_CN [中文](./README.zh_CN.md)
+- en [English](README.md)
+- zh_CN [中文](README.zh_CN.md)
 
 ## 安装
 
@@ -43,7 +51,7 @@ analyze-cli analyze [depth] [jsonFile]
 
 ### 依赖图使用
 #### 2D
-
+< center>
 |  操作   |  效果  |
 |  :----:  | :----:  |
 | 左键节点  |  拖动节点 |
@@ -51,15 +59,17 @@ analyze-cli analyze [depth] [jsonFile]
 | 左键双击画布  |  放大视角 |
 | 侧边栏双击节点  | 跳转到节点 |
 | 滑动滚轮  | 放大缩小视角 |
+< /center>
 
 #### 3D
-
+< center>
 |  操作   |  效果  |
 |  :----:  | :----:  |
 | 左键画布  | 旋转视角 |
 | 左键/右键节点  | 拖动节点 |
 | 右键画布  | 平移视角 |
 | 滑动滚轮  | 缩放视角 |
+< /center>
 
 ## 注意
 
