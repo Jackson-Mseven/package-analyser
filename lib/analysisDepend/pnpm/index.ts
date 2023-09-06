@@ -2,9 +2,9 @@ import * as yaml from 'js-yaml';
 import * as fs from 'fs';
 import * as type from './type';
 import path = require('path');
-import { nameVersionStringify } from '../utils';
 import field from '../field';
-import { DenpendType, DependHash } from '../type';
+import { DenpendType, DependHash, getDependHash } from '../type';
+const { nameVersionStringify } = require('../utils');
 function getPnpmYamlObj() {
 	const pnpm_yamlPath = path.join(
 		process.cwd().replace(/\\/g, '/'),
@@ -105,11 +105,14 @@ function getPnpmAllDependHash(depnedType: DenpendType = field.dependencies) {
 		'5.4': getPnpm5_4AllDependHash,
 		'6.0': getPnpm6_0AllDependHash,
 	};
+	const lockfileVersion = yamlObj.lockfileVersion;
+	const exe = exeHash[lockfileVersion];
+	if (!exe) throw new Error(`pnpm中锁版本${lockfileVersion}还未做兼容`);
 	//@ts-ignore
-	return exeHash[yamlObj?.lockfileVersion]!(depnedType, yamlObj);
+	return exe!(depnedType, yamlObj);
 }
 
-function getPnpmDependHash(/** 递归的最大深度*/ d: number) {
+const getPnpmDependHash: getDependHash = (/** 递归的最大深度*/ d) => {
 	const AllDependHash = getPnpmAllDependHash(field.dependencies);
 	const AllDevDependHash = getPnpmAllDependHash(field.devDependencies);
 	const entryPack = require(path.join(
@@ -134,7 +137,7 @@ function getPnpmDependHash(/** 递归的最大深度*/ d: number) {
 	const devHash: DependHash = {};
 	dfs(0, nameVersion, AllDependHash, hash);
 	dfs(0, nameVersion, AllDevDependHash, devHash);
-	return [hash, devHash] as [DependHash, DependHash];
-}
+	return [hash, devHash];
+};
 
-export default getPnpmDependHash;
+module.exports = getPnpmDependHash;

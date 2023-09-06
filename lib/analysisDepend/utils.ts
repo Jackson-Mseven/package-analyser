@@ -1,12 +1,11 @@
-import * as semver from 'semver';
-
+const semver = require('semver');
 /**
  * 合法版本号是否符合条件
  * @param versionCondition 合法范围 例子^1.1.1 | ~2.2.2
  * @param version 要检查是否合法的版本号
  * @returns
  */
-export const checkVersion = (versionCondition: string, version: string) => {
+const checkVersion = (versionCondition: string, version: string) => {
 	let ranges = versionCondition.split('||').map((s) => s.trim());
 	ranges.forEach((range, idx) => {
 		//npm处理版本范围
@@ -17,12 +16,12 @@ export const checkVersion = (versionCondition: string, version: string) => {
 };
 
 /**名字版本号字符化 */
-export function nameVersionStringify(name: string, version: string) {
+function nameVersionStringify(name: string, version: string) {
 	return `${name} : ${version}`;
 }
 
 /** 名字版本字符串解析 */
-export function nameVersionParse(nameVersion: string) {
+function nameVersionParse(nameVersion: string) {
 	const arr = nameVersion.split(' : ');
 	const version = arr.pop();
 	const name = arr.join(' : ');
@@ -32,11 +31,11 @@ export function nameVersionParse(nameVersion: string) {
 	};
 }
 
-export const isNumberStr = (s: string) => {
+const isNumberStr = (s: string) => {
 	return /^-?\d*\.?\d+$/.test(s);
 };
 
-export function dependHash_To_nameVersionsObj(
+function dependHash_To_nameVersionsObj(
 	hash: Record<string, Record<string, string>> = {}
 ) {
 	const nameToVersion = Object.keys(hash).reduce(
@@ -50,3 +49,11 @@ export function dependHash_To_nameVersionsObj(
 	);
 	return nameToVersion;
 }
+
+module.exports = {
+	checkVersion,
+	nameVersionStringify,
+	nameVersionParse,
+	isNumberStr,
+	dependHash_To_nameVersionsObj,
+};

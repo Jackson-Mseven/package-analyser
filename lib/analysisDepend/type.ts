@@ -17,3 +17,7 @@ export type Data = {
 	dependToVersionsObj: Record<string, string[]>;
 	devDependToVersionsObj: Record<string, string[]>;
 };
+
+export type getDependHash = (
+	/*解析依赖到第几层*/ d: number
+) => [DependHash, DependHash];

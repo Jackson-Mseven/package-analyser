@@ -1,8 +1,8 @@
 import { parse, Dependency, FirstLevelDependency } from '@yarnpkg/lockfile';
 import path = require('path');
 import * as fs from 'fs';
-import { DenpendType, DependHash, Package } from '../type';
-import { nameVersionStringify } from '../utils';
+import { DependHash, Package, getDependHash } from '../type';
+const { nameVersionStringify } = require('../utils');
 
 function getLockObj() {
 	// 读取 yarn.lock 文件的内容
@@ -13,8 +13,11 @@ function getLockObj() {
 	const LockObj = parse(lockfileContent).object;
 	return LockObj;
 }
-function getYarnDependHash(d: number) {
+
+const getYarnDependHash: getDependHash = (d: number) => {
 	const LockObj = getLockObj();
+
+	//将对象中的值从依赖包的版本条件转变成依赖包的信息
 	function getInfoByDepend(dependencies: Record<string, string>) {
 		const nameToInfo: Record<string, FirstLevelDependency> = {};
 		Object.entries(dependencies || {}).forEach(
@@ -51,7 +54,7 @@ function getYarnDependHash(d: number) {
 	dfs(name, version, dependencies, hash, 0);
 	const devHash: DependHash = {};
 	dfs(name, version, devDependencies, devHash, 0);
-	return [hash, devHash] as [DependHash, DependHash];
-}
+	return [hash, devHash];
+};
 
-export default getYarnDependHash;
+module.exports = getYarnDependHash;

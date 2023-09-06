@@ -10,7 +10,6 @@ export type packageLockJsonObj = {
 		};
 	};
 };
-
 export type DependNode = {
 	parent?: DependNode;
 	children: Record<string, DependNode>;
