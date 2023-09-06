@@ -16,7 +16,7 @@ const fileS = require('fs')
  * @param {String} curDepth - 用户输入的依赖深度
  * @returns {Object} packageInfo - 依赖信息
  */
-async function getData(depth: string = "Infinity", packageManagementTools: string, curDepth: string) {
+async function getData(depth: string = "Infinity", packageManagementTools: string, curDepth: string = 'Infinity') {
   // 依赖关系
   const [dependHash, devPendHash] = getDependHash(depth, packageManagementTools);
 
@@ -93,7 +93,6 @@ module.exports = function (packageManagementTools: string): Function {
     p.then((val: object | string) => {
       if (!jsonFile) { // 网页显示
         const server: Function = require('./server');
-        console.log(val);
         server(val);
       } else { // 输出 JSON 文件
         fs.writeFile(jsonFile, JSON.stringify(val as object, null, 2));
