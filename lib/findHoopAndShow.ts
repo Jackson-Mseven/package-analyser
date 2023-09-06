@@ -1,7 +1,7 @@
 /**
    * JSON 转换为 Map 数据格式
-   * @param {*} dataJson：JSON 类型的数据
-   * @return {map} dataMap：Map 类型的数据
+   * @param {JSON} dataJson - JSON 类型的数据
+   * @return {Map} dataMap - Map 类型的数据
    */
 function jsonToMap(
   dataJson: Record<string, Record<string, string>>
@@ -11,8 +11,8 @@ function jsonToMap(
 
 /**
    * 遍历每一个包，将其依赖由对象转换为数组
-   * @param {map} dataMap：数据
-   * @returns {array} directedGraphInfo：有向图信息
+   * @param {Map} dataMap - Map 类型的数据
+   * @returns {Array} directedGraphInfo - 有向图信息
    */
 function typeConversion(dataMap: Map<string, object>): {
   directedGraph: Map<string, Array<string>>;
@@ -120,6 +120,11 @@ function findHoopAndShow(
   return [flag, Object.fromEntries(hoop), Object.fromEntries(hoopVersion)];
 }
 
+/**
+ * 处理循环依赖
+ * @param {JSON} data - JSON 类型的数据
+ * @return {Array} hoopInfo - 环信息
+ */
 export default function (data: Record<string, Record<string, string>>) {
   const dataMap: Map<string, object> = jsonToMap(data); // Map 类型的数据
 

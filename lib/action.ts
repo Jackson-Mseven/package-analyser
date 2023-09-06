@@ -1,8 +1,4 @@
-import field from './analysisDepend/field';
-import {
-  dependHash_To_nameVersionsObj,
-  nameVersionParse
-} from './analysisDepend/utils'
+import { dependHash_To_nameVersionsObj } from './analysisDepend/utils'
 import getDependHash from './analysisDepend/getDependHash'
 import * as fs from 'fs/promises'
 import findHoopAndShow from './findHoopAndShow'

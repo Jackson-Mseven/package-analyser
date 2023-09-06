@@ -1,13 +1,13 @@
 const remote = require('remote-file-size')
 const jsYaml = require('js-yaml')
 var fs = require('fs')
-const need = Object.keys(require(process.cwd().replace(/\\/g, '/') + '/package.json').dependencies || {})
-const needLen = need.length;
 
 /**
  * 处理 npm 包
+ * @param {Array} need - 生产环境的依赖
+ * @param {Number} needLen - 依赖个数
  */
-async function getNpmSizes() {
+async function getNpmSizes(need: Array<string>, needLen: Number) {
   const packages = require(process.cwd().replace(/\\/g, '/') + '/node_modules/.package-lock.json').packages
 
   const urlMap = new Map()
@@ -31,6 +31,7 @@ async function getNpmSizes() {
       })
     })
   })
+
   let res
   await p.then(val => {
     res = val
@@ -42,12 +43,14 @@ async function getNpmSizes() {
 
 /**
  * 处理 yarn 包
+ * @param {Array} need - 生产环境的依赖
+ * @param {Number} needLen - 依赖个数
  */
-async function getYarnSizes() {
+async function getYarnSizes(need: Array<string>, needLen: Number) {
   const urlJSON = JSON.parse(fs.readFileSync('./node_modules/.yarn-integrity', 'utf8')).lockfileEntries
   const p = new Promise((resolve: Function, reject: Function) => {
     const sizeMap = new Map()
-    Object.keys(urlJSON).forEach((item, index) => {
+    Object.keys(urlJSON).forEach((item) => {
       if (need.includes(item.split('@')[0])) {
         const key = item.replace(/@(\^|~)?/i, ' : ')
         const remoteURL = urlJSON[item].slice(0, urlJSON[item].indexOf('tgz') + 3) // 远程地址
@@ -70,8 +73,10 @@ async function getYarnSizes() {
 
 /**
  * 处理 pnpm 包
+ * @param {Array} need - 生产环境的依赖
+ * @param {Number} needLen - 依赖个数
  */
-async function getPnpmSizes() {
+async function getPnpmSizes(need: Array<string>, needLen: Number) {
   try {
     const dependencies = jsYaml.load(fs.readFileSync('./pnpm-lock.yaml', 'utf8')).dependencies;
     const urlMap = new Map() // 远程地址
@@ -107,9 +112,9 @@ async function getPnpmSizes() {
 }
 
 module.exports = async function (packageManagementTools: string) {
-  if (need.length === 0) {
-    return new Map();
-  }
+  const need = Object.keys(require(process.cwd().replace(/\\/g, '/') + '/package.json').dependencies || {})
+  const needLen = need.length;
+  if (needLen === 0) return new Map();
 
   const map: Map<string, Function> = new Map([
     ['npm', getNpmSizes],
@@ -118,9 +123,8 @@ module.exports = async function (packageManagementTools: string) {
   ]);
 
   let res;
-  await map.get(packageManagementTools)!().then((val: Map<string, string>) => {
+  await map.get(packageManagementTools)!(need, needLen).then((val: Map<string, string>) => {
     res = val
   })
-
   return res;
 }
