@@ -15,5 +15,5 @@ module.exports = function (program: programType, version: string, packageManagem
   program
     .command('analyze [depth] [jsonFile]') // 自定义 analyze 命令，接收可选参数 depth 和 jsonFile
     .description('analyze dependency packages') // 命令描述
-    .action(myAction(packageName, version, packageManagementTools, dependencies, devDependencies)) // 命令执行函数
+    .action(myAction(packageManagementTools)) // 命令执行函数
 }

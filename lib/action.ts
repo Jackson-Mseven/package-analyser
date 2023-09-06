@@ -1,69 +1,63 @@
 import field from './analysisDepend/field';
 import {
   dependHash_To_nameVersionsObj,
-  nameVersionParse,
-} from './analysisDepend/utils';
-import getDependHash from './analysisDepend/getDependHash';
-import * as fs from 'fs/promises';
-import findHoopAndShow from './findHoopAndShow';
-const calculateDependentSize: Function = require('./calculateDependentSize');
-const fileS = require('fs');
+  nameVersionParse
+} from './analysisDepend/utils'
+import getDependHash from './analysisDepend/getDependHash'
+import * as fs from 'fs/promises'
+import findHoopAndShow from './findHoopAndShow'
+const calculateDependentSize: Function = require('./calculateDependentSize')
+const fileS = require('fs')
+
+/**
+ * 获取依赖数据
+ * @param {String} depth - 传递给函数的依赖深度
+ * @param {String} packageManagementTools - 包管理工具
+ * @param {String} curDepth - 用户输入的依赖深度
+ * @returns {Object} packageInfo - 依赖信息
+ */
+async function getData(depth: string = "Infinity", packageManagementTools: string, curDepth: string) {
+  // 依赖关系
+  const [dependHash, devPendHash] = getDependHash(depth, packageManagementTools);
+
+  // 依赖版本
+  const dependToVersions = dependHash_To_nameVersionsObj(dependHash);
+  const devDependToVersions = dependHash_To_nameVersionsObj(devPendHash);
+
+  // 循环依赖
+  const dependencyHoop = findHoopAndShow(dependHash);
+  const devDependencyHoop = findHoopAndShow(devPendHash);
+
+  // 依赖体积
+  let dependentSizes;
+  await calculateDependentSize(packageManagementTools).then((val: Map<string, string>) => {
+    dependentSizes = Object.fromEntries(val);
+  });
+
+  return {
+    dependHash,
+    devPendHash,
+    dependToVersions,
+    devDependToVersions,
+    dependencyHoop,
+    devDependencyHoop,
+    dependentSizes,
+    depth: curDepth
+  };
+}
 
 /**
  * 定义命令执行的回调函数
- * @param {string} packageName：包名
- * @param {string} version：版本号
- * @param {string} packageManagementTools：包管理工具
- * @param {object} dependencies：生成环境下的依赖
- * @param {object} devDependencies：开发环境下的依赖
+ * @param {String} packageManagementTools - 包管理工具
+ * @return {Function} callback - 回调函数
  */
-module.exports = function (
-  packageName: string,
-  version: string,
-  packageManagementTools: string,
-  dependencies: object,
-  devDependencies: object
-): Function {
+module.exports = function (packageManagementTools: string): Function {
   /**
    * 命令行的执行逻辑代码
-   * @param {string} depth：递归的深度
-   * @param {string} jsonFile：导出的 JSON 文件路径
+   * @param {String} depth - 递归的深度
+   * @param {String} jsonFile - 导出的 JSON 文件路径
    */
   return async function (depth: string, jsonFile: string) {
-    /**
-     * 获取依赖信息
-     * @returns { object } data：依赖信息
-     */
-    async function getData(dep: string = "Infinity") {
-      // 依赖关系
-      const [dependHash, devPendHash] = getDependHash(dep, packageManagementTools);
-
-      // 依赖版本
-      const dependToVersions = dependHash_To_nameVersionsObj(dependHash);
-      const devDependToVersions = dependHash_To_nameVersionsObj(devPendHash);
-
-      // 循环依赖
-      const dependencyHoop = findHoopAndShow(dependHash);
-      const devDependencyHoop = findHoopAndShow(devPendHash);
-
-      // 依赖体积
-      let dependentSizes;
-      await calculateDependentSize(packageManagementTools).then((val: Map<string, string>) => {
-        dependentSizes = Object.fromEntries(val);
-      });
-
-      return {
-        dependHash,
-        devPendHash,
-        dependToVersions,
-        devDependToVersions,
-        dependencyHoop,
-        devDependencyHoop,
-        dependentSizes,
-        depth: depth || "Infinity"
-      };
-    }
-
     const p: Promise<string | object> = new Promise((resolve: Function, reject: Function) => {
       if (!jsonFile) { // 网页显示
         fileS.stat('./package.json', (err: Error, state: { mtime: number }) => { // 读取 package.json 文件的状态
@@ -73,7 +67,7 @@ module.exports = function (
             if (!err && data.toString() === time) { // 
               resolve({ depth: depth || 'Infinity' });
             } else { // 初始化 或 package.json 改变了
-              await getData("Infinity")
+              await getData("Infinity", packageManagementTools, depth)
                 .then((val) => {
                   fileS.writeFile('./time.txt', time, (err: Error) => {
                     if (err) throw err;
@@ -87,7 +81,7 @@ module.exports = function (
           });
         });
       } else { // 输出 JSON 文件
-        getData(depth).then((val) => {
+        getData(depth, packageManagementTools, depth).then((val) => {
           resolve(val);
         }).catch((err) => {
           reject(err);
@@ -99,6 +93,7 @@ module.exports = function (
     p.then((val: object | string) => {
       if (!jsonFile) { // 网页显示
         const server: Function = require('./server');
+        console.log(val);
         server(val);
       } else { // 输出 JSON 文件
         fs.writeFile(jsonFile, JSON.stringify(val as object, null, 2));
