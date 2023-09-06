@@ -11,10 +11,10 @@ showBar(xData, yData);
  */
 function workWithPieData(data) {
   const resArr = [];
-  Object.keys(data).forEach((package) => {
+  Object.keys(data).forEach((name) => {
     resArr.push({
-      value: Number(data[package].slice(0, -2)),
-      name: package,
+      value: Number(data[name].slice(0, -2)),
+      name: name,
     });
   });
   return resArr.sort((pre, cur) => pre.value - cur.value).slice(0, 10);
@@ -157,31 +157,3 @@ function showBar(xData, yData) {
 
   bar.setOption(option); // 渲染图表
 }
-
-const back = document.querySelector('#back');
-back.addEventListener('click', () => {
-  window.history.back();
-});
-
-const mode = document.querySelector('#mode');
-const changedMode = (init = true) => {
-  let body = document.body;
-  if (localStorage.getItem('mode') == 'day') mode.innerHTML = `夜间模式`;
-  else if (localStorage.getItem('mode') == 'dark') mode.innerHTML = `白天模式`;
-  if (init) body.classList.toggle('dark');
-  else if (!init && localStorage.getItem('mode') == 'dark')
-    body.classList.add('dark'); //初始化时保存的是夜间模式更新背景色
-  showBar(xData, yData);
-  showPie(data);
-};
-
-mode.addEventListener('click', () => {
-  if (localStorage.getItem('mode') == 'dark')
-    localStorage.setItem('mode', 'day');
-  else if (localStorage.getItem('mode') == 'day')
-    localStorage.setItem('mode', 'dark');
-  changedMode();
-});
-
-if (!localStorage.getItem('mode')) localStorage.setItem('mode', 'day');
-else changedMode(false);
