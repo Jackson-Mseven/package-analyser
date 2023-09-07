@@ -42,6 +42,10 @@
   marker-end: url(#arrow);
 }
 
+.hide-link {
+  opacity: 0;
+}
+
 .node {
   fill: rgba(255, 255, 255, 0.8);
   stroke: black;
@@ -50,6 +54,14 @@
 
 .node-hover{
   fill: rgba(255, 0, 0, 0.65);
+  stroke: black;
+  stroke-width: 2px;
+}
+
+.hide-node{
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 0;
 }
 
 .root {

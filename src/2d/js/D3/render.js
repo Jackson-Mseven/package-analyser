@@ -6,20 +6,17 @@ import { asideInit } from './initAside.js';
 import { renderLine, renderBlock } from './line.js';
 import { initPath } from './initPath.js';
 
-let highLight;
-let updatePosition;
+let highLight, updatePosition;
 const toggleMode = (el) => el.classList.add('active');
 
 export function show(res) {
-	const {dependHash,devPendHash,dependToVersions,devDependToVersions,dependencyHoop,devDependencyHoop,} = handleDifferentSituation(res);
-
-	let isPolyline = false; // true: 折线 ;false: 曲线
-	let cachedNormalX = null, cachedNormalY = null; // 存储普通节点移动距离
+	const { dependHash, devPendHash, dependToVersions, devDependToVersions, dependencyHoop, devDependencyHoop, } = handleDifferentSituation(res);
+  // true: 折线 ;false: 曲线
+	let isPolyline = false, cachedNormalX = null, cachedNormalY = null; // 存储普通节点移动距离
 
 	// 渲染依赖图
 	const init = (flag, data, noRoot = false) => { // true: 折线 ;false: 曲线; noRoot:环状数据时无根节点
-		let cachedRootX = null, cachedRootY = null; // 存储根节点移动距离
-		let x = null, y = null;
+		let cachedRootX = null, cachedRootY = null, x = null, y = null;
 
 		d3.select('SVG').call(d3.zoom().scaleExtent([0.1, 1.5]).on('zoom', zoomed));
 		d3.select('#SVG').append('g').attr('id', 'graph').attr('style', 'display:none'); // 创建图形容器
@@ -28,13 +25,9 @@ export function show(res) {
 
 		let simulation; // 创建力导向图模拟
 		if (flag) {
-			simulation = d3.forceSimulation(data.nodes).force('link', d3.forceLink(data.links).id((d) => d.id).distance(100))
-				.force('charge', d3.forceManyBody().strength(-50)) // 创建斥力
-				.force('center', d3.forceCenter(0, (10 * data.nodes.length) / 3)); // 设置中心点
+			simulation = d3.forceSimulation(data.nodes).force('link', d3.forceLink(data.links).id((d) => d.id).distance(100)).force('charge', d3.forceManyBody().strength(-50)).force('center', d3.forceCenter(0, (10 * data.nodes.length) / 3)); // 创建斥力、设置中心点
 		} else if (!flag) {
-			simulation = d3.forceSimulation(data.nodes).force('link', d3.forceLink(data.links).id((d) => d.id).distance(150))
-				.force('charge', d3.forceManyBody().strength(-50)) // 创建斥力
-				.force('center', d3.forceCenter(0, (60 * data.nodes.length) / 3)); // 设置中心点
+			simulation = d3.forceSimulation(data.nodes).force('link', d3.forceLink(data.links).id((d) => d.id).distance(150)).force('charge', d3.forceManyBody().strength(-50)).force('center', d3.forceCenter(0, (60 * data.nodes.length) / 3)); // 创建斥力、设置中心点
 		}
 		// 节点拖拽行为
 		const dragstarted = (d) => {
@@ -83,12 +76,11 @@ export function show(res) {
 		else if (!flag) verticalForce = d3.forceY().y((d) => (d.id == data.nodes[0].id ? -40 * data.nodes.length : d.y));
 		simulation.force('vertical', verticalForce).force('horizontal', horizontalForce); // 根节点高度
 
-	  const nodePadding = 20; // 文本宽度
+		const nodePadding = 20; // 文本宽度
 		const updateNodes = () => {
-			// 边框宽度
-			rect.attr('width', (d) => getTextWidth(d.id) + nodePadding).attr('height', (d) => getTextHeight() + nodePadding).attr('rx', 6).attr('ry', 6).attr('x', (d) => -getTextWidth(d.id) / 2 - nodePadding / 2).attr('y', (d) => -getTextHeight() / 2 - nodePadding / 2);
-			// 创建碰撞力，避免节点重叠
-			simulation.force('collision', d3.forceCollide().radius((d) => Math.max(getTextWidth(d.id), getTextHeight()) + nodePadding));
+			rect.attr('width', (d) => getTextWidth(d.id) + nodePadding).attr('height', (d) => getTextHeight() + nodePadding).attr('rx', 6).attr('ry', 6).attr('x', (d) => -getTextWidth(d.id) / 2 - nodePadding / 2).attr('y', (d) => -getTextHeight() / 2 - nodePadding / 2); // 边框宽度
+
+			simulation.force('collision', d3.forceCollide().radius((d) => Math.max(getTextWidth(d.id), getTextHeight()) + nodePadding)); // 创建碰撞力，避免节点重叠
 		};
 		updateNodes();
 
@@ -101,10 +93,10 @@ export function show(res) {
 			d3.zoom().scaleExtent([0.01, 100]).on('zoom', zoomed).transform(d3.select('#SVG'), d3.zoomIdentity.translate(-(a ? a + x : x) / multiple, -(b + y ? b : y))); // 重置内部状态
 		}
 		updatePosition = (num, cachedX, cachedY) => {
-			if (num == 'init') { node.filter((d) => {if (d.id == data.nodes[0].id) dragended.call(d, d, num);});}
+			if (num == 'init') { node.filter((d) => { if (d.id == data.nodes[0].id) dragended.call(d, d, num); }); }
 			node.attr('getPosition', (d) => {
 				if (d.index == num && d.index == data.nodes[0].index) rootOrNormal(d, cachedRootX, cachedRootY, 1); // 返回根节点
-				else if (d.index == num) rootOrNormal(d, cachedX ? cachedX : cachedNormalX, cachedY?cachedY : cachedNormalY, 2);
+				else if (d.index == num) rootOrNormal(d, cachedX ? cachedX : cachedNormalX, cachedY ? cachedY : cachedNormalY, 2);
 			});
 		};
 		updatePosition('init');
@@ -128,20 +120,48 @@ export function show(res) {
 		window.addEventListener('resize', updateViewPort);
 
 		// 悬停节点 突出以该节点为起点的依赖
-		highLight = (id, cancel) => {
-			let hoveredNodeId = null;
+		highLight = (id, cancel = null) => {
+			let hoveredNodeId = null, nodeIndex = null;
 			node.on('mouseover', (d) => {
 				hoveredNodeId = d.id;
+				nodeIndex = d.index;
 				highlightLinks();
 			});
 			node.on('mouseout', () => {
 				hoveredNodeId = null;
-				highlightLinks();
+				nodeIndex = null;
+				defaultLinks();
 			});
+
 			const highlightLinks = () => { // 设置高亮
+				let result = [], single = true;
+				const getRelated = (sourceId) => {
+					link.attr('xxx', (obj) => {
+						if (sourceId == obj.source.id)
+							if (!result.includes(obj.target.id)) result.push(obj.target.id);
+					})
+				};
 				link.attr('class', (d) => {	// 设置与悬停节点相关的连线样式
-					if (d.source.id == hoveredNodeId) return 'link-hover';
-					else return 'link';
+					if (d.source.id == hoveredNodeId) {
+						single = false;
+						getRelated(d.source.id);
+
+						node.attr('class', (n) => {
+							if (n.id === d.source.id) return 'node-hover';
+							else if (result.includes(n.id)) return 'node';
+							else return 'hide-node';
+						})
+						return 'link-hover';
+					}
+					else {
+						if (single)
+							node.attr('class', (n) => {
+								if (n.id === hoveredNodeId) return 'node-hover';
+								else return 'hide-node';
+							})
+
+						return 'hide-link';
+					}
 				});
 			};
 			const defaultLinks = () => { //取消高亮
@@ -151,6 +171,7 @@ export function show(res) {
 					else return 'node';
 				});
 			};
+
 			if (id && !cancel) {
 				hoveredNodeId = id;
 				node.attr('class', (d) => {
@@ -161,7 +182,7 @@ export function show(res) {
 					}
 				});
 				highlightLinks();
-			}
+			};
 			if (cancel) defaultLinks();
 		};
 		highLight();
@@ -211,7 +232,8 @@ export function show(res) {
 				asideInit(devDependencyHoop);
 			}
 			init(isPolyline, ringData, true);
-		} else {
+		}
+		else {
 			showRingBtn.innerHTML = '点击展示';
 			const svg = d3.select('#graph');
 			svg.remove();
