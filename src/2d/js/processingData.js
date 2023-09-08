@@ -103,31 +103,19 @@ function convertJsonToArrays(data) {
  * @param {Object} data - 所有数据
  */
 function getRenderData(data) {
-  let dependHash;
-  let devPendHash;
-  let dependToVersions;
-  let devDependToVersions;
-  let dependencyHoop;
-  let devDependencyHoop;
-
+  let dependHash = JSON.parse(localStorage.getItem('dependHashObj'))
+  let devPendHash = JSON.parse(localStorage.getItem('devPendHashObj'))
+  let dependencyHoop = JSON.parse(localStorage.getItem('dependencyHoopObj'))[1]
+  let devDependencyHoop = JSON.parse(localStorage.getItem('devDependencyHoopObj'))[1];
   // 1、处理深度
-  if (data.depth !== 'Infinity') {
-    // 局部递归
-    dependHash = getDepthData(JSON.parse(localStorage.getItem('dependHashObj')), data.depth);
-    devPendHash = getDepthData(JSON.parse(localStorage.getItem('devPendHashObj')), data.depth);
-    dependencyHoop = getDepthData(JSON.parse(localStorage.getItem('dependencyHoopObj'))[1], data.depth);
-    devDependencyHoop = getDepthData(JSON.parse(localStorage.getItem('devDependencyHoopObj'))[1], data.depth);
-  } else {
-    // 全局递归
-    dependHash = JSON.parse(localStorage.getItem('dependHashObj'));
-    devPendHash = JSON.parse(localStorage.getItem('devPendHashObj'));
-    dependencyHoop = JSON.parse(localStorage.getItem('dependencyHoopObj'))[1];
-    devDependencyHoop = JSON.parse(localStorage.getItem('devDependencyHoopObj'))[1];
+  if (data.depth !== 'Infinity') { // 局部递归
+    dependHash = getDepthData(dependHash, data.depth);
+    devPendHash = getDepthData(devPendHash, data.depth);
   }
 
   // 2、获取版本
-  dependToVersions = getDepthVersion(dependHash);
-  devDependToVersions = getDepthVersion(devPendHash);
+  let dependToVersions = getDepthVersion(dependHash);
+  let devDependToVersions = getDepthVersion(devPendHash);
 
   // 3、处理格式
   dependHash = convertJsonToArrays(dependHash);

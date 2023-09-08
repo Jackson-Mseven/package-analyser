@@ -8,3 +8,4 @@ node_modules
 .prettierrc.json
 settings.json
 tsconfig.json
+/dist/test

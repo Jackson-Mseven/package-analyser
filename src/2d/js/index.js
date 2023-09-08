@@ -5,7 +5,5 @@ import { getData } from './getData.js';
 const dataPromise = getData(show);
 
 dataPromise.then((val) => {
-	show(val); // 渲染节点
+  show(val); // 渲染节点
 });
-
-
