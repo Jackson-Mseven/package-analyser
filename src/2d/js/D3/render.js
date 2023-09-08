@@ -232,7 +232,7 @@ export function show(res) {
         showDepend(JSON.parse(localStorage.getItem('devDependencyHoopObj'))[2]);
         asideInit(devDependencyHoop);
       }
-      init(isPolyline, ringData, true);
+			init(isPolyline, ringData, true);
     }
     else {
       showRingBtn.innerHTML = '点击展示';
@@ -242,12 +242,12 @@ export function show(res) {
       backRootBtn.classList.remove('disabled');
       init(isPolyline, inputData);
       if (inputData == dependHash) {
-        asideInit(dependHash);
-        showDepend(dependToVersions);
+				showDepend(dependToVersions);
+				asideInit(dependHash);
       } else if (inputData == devPendHash) {
-        asideInit(devPendHash);
         showDepend(devDependToVersions);
-      }
+				asideInit(devPendHash);
+			}
     }
   });
 
@@ -265,7 +265,7 @@ export function show(res) {
   // 切换依赖环境
   const dependencies = document.querySelector('#dependencies');
   const devDependencies = document.querySelector('#devDependencies');
-  const commonChange = (lastData, nextData, version, source, btn) => {
+  const commonChange = (lastData, nextData, version, source, btn, hoopObj) => {
     if (inputData == lastData) {
       const svg = d3.select('#graph');
       svg.remove();
@@ -275,15 +275,15 @@ export function show(res) {
       source.classList.remove('active');
       toggleMode(btn);
       asideInit(nextData);
-      visibleRingBtn(JSON.parse(localStorage.getItem('devDependencyHoopObj'))[0]);
+      visibleRingBtn(JSON.parse(localStorage.getItem(`${hoopObj}`))[0]);
       isOn = false;
       showRingBtn.innerHTML = '点击展示';
       document.querySelector('#backRootBtn').classList.remove('disabled');
     }
   };
 
-  dependencies.addEventListener('click', () => commonChange(devPendHash, dependHash, dependToVersions, devDependencies, dependencies));
-  devDependencies.addEventListener('click', () => commonChange(dependHash, devPendHash, devDependToVersions, dependencies, devDependencies));
+  dependencies.addEventListener('click', () => commonChange(devPendHash, dependHash, dependToVersions, devDependencies, dependencies, "dependencyHoopObj"));
+  devDependencies.addEventListener('click', () => commonChange(dependHash, devPendHash, devDependToVersions, dependencies, devDependencies, "devDependencyHoopObj"));
 
   toggleMode(dependencies);
   showDepend(dependToVersions);
