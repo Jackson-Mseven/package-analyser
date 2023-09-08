@@ -3,11 +3,13 @@
 <div align="center">
 
 ![Static Badge](https://img.shields.io/badge/bulid-experimental-orange)
-![Static Badge](https://img.shields.io/badge/size-91.6KB-blue)
- [![NPM version][npm-image]][npm-url]
+[![NPM version][npm-image]][npm-url]
 
-[npm-image]:https://img.shields.io/github/package-json/v/Jackson-Mseven/package-analyser
+[npm-image]: https://badge.fury.io/js/package-analyser.svg
 [npm-url]: https://www.npmjs.com/package/package-analyser
+
+![Static Badge](https://img.shields.io/badge/size-94.6KB-blue)
+![GitHub repo size](https://img.shields.io/github/repo-size/Jackson-Mseven/package-analyser)
 
 ![Static Badge](https://img.shields.io/badge/license-MIT-yellow)
 </div>
